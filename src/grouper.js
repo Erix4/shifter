@@ -82,11 +82,10 @@ export default class Grouper{
             if(this.game.viewMode == 0){//rows
                 for (i = 0; i < this.outSize; i++){//cycle rows (change y axis)
                     var line = false;
-                    var n;
                     var build = 0;
                     var grStart = 0;
                     var cellList = [];
-                    for (n = 0; n < this.outSize; n++){//cycle cells in row (change x axis)
+                    for (var n = 0; n < this.outSize; n++){//cycle cells in row (change x axis)
                         if(this.game.map[(this.outSize * i) + n] != this.inCap){
                             if(line == false){//new group started
                                 line = true;
@@ -105,17 +104,16 @@ export default class Grouper{
                         }
                     }
                     if(build == this.inSize){//full 6 cell group
-                        this.groups.push([i, grStart].concat(cellList));//add group to list [row, cell start]
+                        this.groups.push([i, grStart].concat(cellList));//add group to list [row, cell start, cells]
                     }
                 }
             }else{//columns
                 for (i = 0; i < this.outSize; i++){//cycle columns (change x axis)
                     var line = false;
-                    var n;
                     var build = 0;
                     var grStart = 0;
                     var cellList = [];
-                    for (n = 0; n < this.outSize; n++){//cycle cells in column (change y axis)
+                    for (var n = 0; n < this.outSize; n++){//cycle cells in column (change y axis)
                         if(this.game.map[(this.outSize * n) + i] != this.inCap){
                             if(line == false){//new group started
                                 line = true;
@@ -143,7 +141,7 @@ export default class Grouper{
     //
     selectGroup(event){//identify group beneath cursor
         //console.log("Reselecting group, viewmode: " + this.game.viewMode);
-        console.log("y input: " + event.offsetY);
+        //console.log("y input: " + event.offsetY);
         this.selectedGroup = this.inSize;
         if(this.game.viewMode == 0){//rows
             this.groups.some((element, i) => {

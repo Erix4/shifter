@@ -153,8 +153,10 @@ var Cell = /*#__PURE__*/function () {
     this.offset = game.offset; //offset of puzzle in grid
     //
 
-    this.iy = Math.floor(valIndex / this.inSize);
-    this.ix = valIndex - this.inSize * this.iy; //
+    this.iy = Math.floor(valIndex / this.inSize); //inner x
+
+    this.ix = valIndex - this.inSize * this.iy; //inner y
+    //
 
     this.y = this.iy + this.offset; //current x
 
@@ -477,12 +479,11 @@ var Grouper = /*#__PURE__*/function () {
           for (i = 0; i < this.outSize; i++) {
             //cycle rows (change y axis)
             var line = false;
-            var n;
             var build = 0;
             var grStart = 0;
             var cellList = [];
 
-            for (n = 0; n < this.outSize; n++) {
+            for (var n = 0; n < this.outSize; n++) {
               //cycle cells in row (change x axis)
               if (this.game.map[this.outSize * i + n] != this.inCap) {
                 if (line == false) {
@@ -510,7 +511,7 @@ var Grouper = /*#__PURE__*/function () {
 
             if (build == this.inSize) {
               //full 6 cell group
-              this.groups.push([i, grStart].concat(cellList)); //add group to list [row, cell start]
+              this.groups.push([i, grStart].concat(cellList)); //add group to list [row, cell start, cells]
             }
           }
         } else {
@@ -518,12 +519,11 @@ var Grouper = /*#__PURE__*/function () {
           for (i = 0; i < this.outSize; i++) {
             //cycle columns (change x axis)
             var line = false;
-            var n;
             var build = 0;
             var grStart = 0;
             var cellList = [];
 
-            for (n = 0; n < this.outSize; n++) {
+            for (var n = 0; n < this.outSize; n++) {
               //cycle cells in column (change y axis)
               if (this.game.map[this.outSize * n + i] != this.inCap) {
                 if (line == false) {
@@ -565,7 +565,7 @@ var Grouper = /*#__PURE__*/function () {
 
       //identify group beneath cursor
       //console.log("Reselecting group, viewmode: " + this.game.viewMode);
-      console.log("y input: " + event.offsetY);
+      //console.log("y input: " + event.offsetY);
       this.selectedGroup = this.inSize;
 
       if (this.game.viewMode == 0) {
@@ -624,11 +624,15 @@ var InputHandler = function InputHandler(game) {
   this.lastMouseEvent = null; //
 
   this.touched = false;
+  this.reverb = false; //prevent second click on touch release
+
   document.addEventListener("mousemove", function (event) {
     if (_this.game.gamestate == 0) {
       if (_this.game.moving == _this.game.inSize) {
         if (!_this.touched) {
           _this.game.grouper.selectGroup(event);
+
+          console.log("Selecting group");
         }
       } else {
         _this.game.moveGroup(event);
@@ -637,17 +641,24 @@ var InputHandler = function InputHandler(game) {
 
 
     _this.lastMouseEvent = event;
+    _this.touched = false;
   }); //
 
   document.addEventListener("mousedown", function (event) {
-    if (_this.game.gamestate > 0) {
-      _this.game.menu.checkNext(event);
+    if (!_this.reverb) {
+      if (_this.game.gamestate > 0) {
+        _this.game.menu.checkNext(event);
 
-      _this.game.grouper.identify();
+        console.log("Identifying");
 
-      _this.game.grouper.selectGroup(event);
+        _this.game.grouper.identify();
+
+        _this.game.grouper.selectGroup(event);
+      } else if (_this.game.grouper.selectedGroup != _this.game.inSize) {
+        _this.game.startGroupMove(event);
+      }
     } else {
-      _this.game.startGroupMove(event);
+      _this.reverb = false;
     }
   }); //
 
@@ -764,6 +775,7 @@ var InputHandler = function InputHandler(game) {
     _this.game.grouper.selectGroup(event);
 
     console.log("group cleared");
+    _this.reverb = true;
   });
 } //
 ;
@@ -1176,15 +1188,17 @@ var Game = /*#__PURE__*/function () {
       var _this = this;
 
       //load level into grid based on level index (key)
-      if (key >= _levels.lvs.length) {
-        //check level exists
-        console.log("Load command failed, level does not exist");
-        this.level--;
-      } else if (_levels.lvs[key].length < 4) {
-        //check that a map exists
-        console.log("Load command failed, level is corrupted");
-        this.level--;
-      } else {
+      this.moving = this.inSize;
+      /*if(key >= lvs.length){//check level exists
+          console.log("Load command failed, level does not exist");
+          this.level--;
+      }else if(lvs[key].length < 4){//check that a map exists
+          console.log("Load command failed, level is corrupted");
+          this.level--;
+      }else */
+
+      if (this.level < 6) {
+        //6
         var level = _levels.lvs[key]; //reset variables
 
         console.log("Load command registered, level index: " + key);
@@ -1227,6 +1241,61 @@ var Game = /*#__PURE__*/function () {
 
           }
         });
+      } else {
+        //var level = lvs[key];//reset variables
+        console.log("Load command registered, generating level.");
+        this.inSize = 6; //goal grid size
+
+        this.outSize = 12; //total grid size
+
+        this.offset = Math.floor((this.outSize - this.inSize) / 2); //goal grid offset from top left
+
+        this.colors = 3; //# of colors used
+
+        this.pattern = 0; //pattern of colors used (passed into cell, which determines own color)
+
+        this.inCap = this.inSize * this.inSize;
+        this.outCap = this.outSize * this.outSize; //
+
+        this.gamestate = GAMESTATE.RUNNING;
+        console.log("Gamestate changed to: 'RUNNING'"); //
+
+        this.map = Array(this.outCap).fill(this.inCap); //reset map to default values
+        //
+
+        this.cells = [];
+        this.goalMap = Array(this.outCap).fill(this.colors); //reset goal map to default values
+
+        console.log("Map values reset, intializing generation loop...");
+        var i;
+
+        for (i = 0; i < this.inCap; i++) {
+          //fill in goal values for every generated cell in the goal map
+          this.cells.push(new _cell.default(this, i));
+          this.goalMap[this.cells[i].locIndex] = this.cells[i].state;
+          this.map[this.cells[i].locIndex] = this.cells[i].valIndex;
+        } //
+
+
+        console.log("Complete, randomizing switches...");
+        this.stopOdds = this.level; //# of loops until chances are 50/50 for stopping
+
+        for (i = 0; Math.random() > i / (i + this.stopOdds); i++) {
+          //switch cells for a random number of loops
+          var ranCell1 = this.cells[Math.floor(this.inCap * Math.random())];
+          var ranCell2 = this.cells[Math.floor(this.inCap * Math.random())];
+          console.log("Switching (".concat(ranCell1.x, ", ").concat(ranCell1.y, ") and (").concat(ranCell2.x, ", ").concat(ranCell2.y, ")")); //
+
+          this.map[ranCell1.locIndex] = ranCell2.valIndex;
+          this.map[ranCell2.locIndex] = ranCell1.valIndex;
+          var sVal = ranCell2.valIndex;
+          var sLoc = ranCell1.locIndex;
+          this.cells[ranCell1.valIndex].setLocation(ranCell2.locIndex);
+          this.cells[sVal].setLocation(sLoc); //console.log(this.cells);
+        }
+
+        console.log("Complete!");
+        this.grouper.identify();
       }
     } //
 
@@ -1350,7 +1419,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52342" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59379" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

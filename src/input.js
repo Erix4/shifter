@@ -5,11 +5,13 @@ export default class InputHandler{
         this.lastMouseEvent = null;
         //
         this.touched = false;
+        this.reverb = false;//prevent second click on touch release
         document.addEventListener("mousemove", event => {
             if(this.game.gamestate == 0){
                 if(this.game.moving == this.game.inSize){
                     if(!this.touched){
                         this.game.grouper.selectGroup(event);
+                        console.log("Selecting group");
                     }
                 }else{
                     this.game.moveGroup(event);
@@ -17,15 +19,21 @@ export default class InputHandler{
             }
             //console.log("offset x: " + event.offsetX);
             this.lastMouseEvent = event;
+            this.touched = false;
         });
         //
         document.addEventListener("mousedown", event => {
-            if(this.game.gamestate > 0){
-                this.game.menu.checkNext(event);
-                this.game.grouper.identify();
-                this.game.grouper.selectGroup(event);
+            if(!this.reverb){
+                if(this.game.gamestate > 0){
+                    this.game.menu.checkNext(event);
+                    console.log("Identifying");
+                    this.game.grouper.identify();
+                    this.game.grouper.selectGroup(event);
+                }else if(this.game.grouper.selectedGroup != this.game.inSize){
+                    this.game.startGroupMove(event);
+                }
             }else{
-                this.game.startGroupMove(event);
+                this.reverb = false;
             }
         });
         //
@@ -114,6 +122,7 @@ export default class InputHandler{
             event.offsetY = 0;
             this.game.grouper.selectGroup(event);
             console.log("group cleared");
+            this.reverb = true;
         });
     }
     //

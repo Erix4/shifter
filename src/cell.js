@@ -12,8 +12,8 @@ export default class Cell{
         this.outCap = game.outCap;//total # of outer cells
         this.offset = game.offset;//offset of puzzle in grid
         //
-        this.iy = Math.floor(valIndex / this.inSize);
-        this.ix = valIndex - (this.inSize * this.iy);
+        this.iy = Math.floor(valIndex / this.inSize);//inner x
+        this.ix = valIndex - (this.inSize * this.iy);//inner y
         //
         this.y = this.iy + this.offset;//current x
         this.x = this.ix + this.offset;//current y

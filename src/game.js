@@ -180,13 +180,14 @@ export default class Game {
     }
     //
     loadLevel(key){//load level into grid based on level index (key)
-        if(key >= lvs.length){//check level exists
+        this.moving = this.inSize;
+        /*if(key >= lvs.length){//check level exists
             console.log("Load command failed, level does not exist");
             this.level--;
         }else if(lvs[key].length < 4){//check that a map exists
             console.log("Load command failed, level is corrupted");
             this.level--;
-        }else{
+        }else */if(this.level < 6){//6
             var level = lvs[key];//reset variables
             console.log("Load command registered, level index: " + key);
             this.inSize = level[0];//goal grid size
@@ -215,6 +216,49 @@ export default class Game {
                     this.cells[element].setLocation(i);//update cell object's location
                 }
             });
+        }else{
+            //var level = lvs[key];//reset variables
+            console.log("Load command registered, generating level.");
+            this.inSize = 6;//goal grid size
+            this.outSize = 12;//total grid size
+            this.offset = Math.floor((this.outSize - this.inSize) / 2);//goal grid offset from top left
+            this.colors = 3;//# of colors used
+            this.pattern = 0;//pattern of colors used (passed into cell, which determines own color)
+            this.inCap = this.inSize * this.inSize;
+            this.outCap = this.outSize * this.outSize;
+            //
+            this.gamestate = GAMESTATE.RUNNING;
+            console.log("Gamestate changed to: 'RUNNING'");
+            //
+            this.map = Array(this.outCap).fill(this.inCap);//reset map to default values
+            //
+            this.cells = [];
+            this.goalMap = Array(this.outCap).fill(this.colors);//reset goal map to default values
+            console.log("Map values reset, intializing generation loop...");
+            var i;
+            for(i = 0; i < this.inCap; i++){//fill in goal values for every generated cell in the goal map
+                this.cells.push(new Cell(this, i));
+                this.goalMap[this.cells[i].locIndex] = this.cells[i].state;
+                this.map[this.cells[i].locIndex] = this.cells[i].valIndex;
+            }
+            //
+            console.log("Complete, randomizing switches...");
+            this.stopOdds = this.level;//# of loops until chances are 50/50 for stopping
+            for(i = 0; Math.random() > i / (i + this.stopOdds); i++){//switch cells for a random number of loops
+                var ranCell1 = this.cells[Math.floor(this.inCap * Math.random())];
+                var ranCell2 = this.cells[Math.floor(this.inCap * Math.random())];
+                console.log(`Switching (${ranCell1.x}, ${ranCell1.y}) and (${ranCell2.x}, ${ranCell2.y})`);
+                //
+                this.map[ranCell1.locIndex] = ranCell2.valIndex;
+                this.map[ranCell2.locIndex] = ranCell1.valIndex;
+                let sVal = ranCell2.valIndex;
+                let sLoc= ranCell1.locIndex;
+                this.cells[ranCell1.valIndex].setLocation(ranCell2.locIndex);
+                this.cells[sVal].setLocation(sLoc);
+                //console.log(this.cells);
+            }
+            console.log("Complete!");
+            this.grouper.identify();
         }
     }
     //
