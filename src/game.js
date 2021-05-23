@@ -63,7 +63,7 @@ export default class Game {
         //
         this.unit = this.artist.unit;//px length for each cell
         //
-        new InputHandler(this, this.grouper, this.gamestate);//handle key and mouse inputs
+        new InputHandler(this);//handle key and mouse inputs
         this.menu = new Menu(this);//draw for WON and MENU gamestates
         //
         this.smallFont = this.menu.fontSize / 2;
@@ -77,6 +77,9 @@ export default class Game {
         switch(this.gamestate){
             case GAMESTATE.RUNNING:
                 this.gameObjects.forEach(object => object.draw(ctx));
+                ctx.font = '20px "Pixeled"';
+                ctx.fillStyle = "black";
+                ctx.fillText(("level: " + (this.level + 1)), 10, 20);
                 break;
             //
             case GAMESTATE.WON:

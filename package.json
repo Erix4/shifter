@@ -1,20 +1,20 @@
 {
-    "name": "shifter",
-    "version": "1.0.0",
-    "description": "a puzzle game with shifting",
-    "main": "index.html",
-    "scripts": {
-      "start": "parcel index.html --open",
-      "build": "parcel build index.html"
-    },
-    "dependencies": {
-      "chokidar": "^3.4.0",
-      "core-js": "^3.6.5",
-      "fontfaceobserver": "^2.1.0"
-    },
-    "devDependencies": {
-      "@babel/core": "7.2.0",
-      "parcel-bundler": "^1.6.1"
-    },
-    "keywords": []
+  "name": "shifter",
+  "version": "1.0.0",
+  "description": "a puzzle game with shifting",
+  "main": "index.html",
+  "scripts": {
+    "start": "parcel index.html --open",
+    "build": "parcel build index.html"
+  },
+  "dependencies": {
+    "chokidar": "^3.4.0",
+    "core-js": "^3.6.5",
+    "fontfaceobserver": "^2.1.0"
+  },
+  "devDependencies": {
+    "@babel/core": "7.2.0",
+    "parcel-bundler": "^1.6.1"
+  },
+  "keywords": []
 }

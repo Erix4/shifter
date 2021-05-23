@@ -74,7 +74,7 @@ export default class Grouper{
         //
     }
     //
-    identify(){
+    identify(){//find the groups of cells (rows and columns)
         if(this.game.moving == this.inSize){
             this.groups = [];
             //
@@ -141,8 +141,9 @@ export default class Grouper{
         }
     }
     //
-    selectGroup(event){
-        //console.log("Reselecting group");
+    selectGroup(event){//identify group beneath cursor
+        //console.log("Reselecting group, viewmode: " + this.game.viewMode);
+        console.log("y input: " + event.offsetY);
         this.selectedGroup = this.inSize;
         if(this.game.viewMode == 0){//rows
             this.groups.some((element, i) => {
@@ -171,6 +172,7 @@ export default class Grouper{
                     event.offsetY < bottom)
                 {
                     this.selectedGroup = i;
+                    //console.log("Successful: " + i);
                     return true;
                 }
             });
