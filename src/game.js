@@ -141,7 +141,6 @@ export default class Game {
     moveGroup(event){//move a selected group with the cursor's x or y
         let cx = Math.floor((event.offsetX - this.mouseStartX + (this.unit / 2)) / this.unit);
         let cy = Math.floor((event.offsetY - this.mouseStartY + (this.unit / 2)) / this.unit);
-        //console.log(`cx: ${cx}`);
         //
         var group = this.grouper.groups[this.grouper.selectedGroup]
         //console.log(group);
@@ -149,6 +148,7 @@ export default class Game {
         var grStart = this.grouper.groupStart;
         //console.log(grStart);
         if(this.viewMode == 0){//rows
+            //console.log(`cx, cy: ${cx}, 0`);
             if(grStart + cx + this.inSize > this.outSize){
                 cx = this.outSize - this.inSize - grStart;
             }else if(grStart + cx < 0){
@@ -160,6 +160,7 @@ export default class Game {
             }
             this.grouper.groups[this.grouper.selectedGroup][1] = grStart + cx;
         }else{//columns
+            //console.log(`cx, cy: 0, ${cy}`);
             if(grStart + cy + this.inSize > this.outSize){
                 cy = this.outSize - this.inSize - grStart;
             }else if(grStart + cy < 0){

@@ -206,12 +206,14 @@ var Cell = /*#__PURE__*/function () {
       this.x = this.orx + cx; //calc new x (move origin x plus change x)
       //
 
-      this.game.map[this.locIndex] = this.inCap; //set old map location as default
+      if (this.game.map[this.locIndex] == this.valIndex) {
+        //check that old map location hasn't already been changed
+        this.game.map[this.locIndex] = this.inCap; //set old map location as default
+      }
 
       this.locIndex = this.outSize * this.y + this.x; //find new location index
 
       this.game.map[this.locIndex] = this.valIndex; //set new map location as cell value
-      //potential failure is second map set ^^, either locIndex is improperly set or something else, very rare
     } //
 
   }, {
@@ -1140,8 +1142,7 @@ var Game = /*#__PURE__*/function () {
     value: function moveGroup(event) {
       //move a selected group with the cursor's x or y
       var cx = Math.floor((event.offsetX - this.mouseStartX + this.unit / 2) / this.unit);
-      var cy = Math.floor((event.offsetY - this.mouseStartY + this.unit / 2) / this.unit); //console.log(`cx: ${cx}`);
-      //
+      var cy = Math.floor((event.offsetY - this.mouseStartY + this.unit / 2) / this.unit); //
 
       var group = this.grouper.groups[this.grouper.selectedGroup]; //console.log(group);
 
@@ -1150,6 +1151,7 @@ var Game = /*#__PURE__*/function () {
 
       if (this.viewMode == 0) {
         //rows
+        //console.log(`cx, cy: ${cx}, 0`);
         if (grStart + cx + this.inSize > this.outSize) {
           cx = this.outSize - this.inSize - grStart;
         } else if (grStart + cx < 0) {
@@ -1164,6 +1166,7 @@ var Game = /*#__PURE__*/function () {
         this.grouper.groups[this.grouper.selectedGroup][1] = grStart + cx;
       } else {
         //columns
+        //console.log(`cx, cy: 0, ${cy}`);
         if (grStart + cy + this.inSize > this.outSize) {
           cy = this.outSize - this.inSize - grStart;
         } else if (grStart + cy < 0) {

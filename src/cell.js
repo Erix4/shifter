@@ -48,10 +48,11 @@ export default class Cell{
         this.y = this.ory + cy;//calc new y (move origin y plus change y)
         this.x = this.orx + cx;//calc new x (move origin x plus change x)
         //
-        this.game.map[this.locIndex] = this.inCap;//set old map location as default
+        if(this.game.map[this.locIndex] == this.valIndex){//check that old map location hasn't already been changed
+            this.game.map[this.locIndex] = this.inCap;//set old map location as default
+        }
         this.locIndex = (this.outSize * this.y) + this.x;//find new location index
         this.game.map[this.locIndex] = this.valIndex;//set new map location as cell value
-        //potential failure is second map set ^^, either locIndex is improperly set or something else, very rare
     }
     //
     resetOrigin(){
