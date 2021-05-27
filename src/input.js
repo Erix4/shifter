@@ -93,6 +93,10 @@ export default class InputHandler{
                 if(this.game.grouper.selectedGroup != this.game.inSize){
                     console.log("selected group: " + this.game.grouper.selectedGroup);
                     this.game.startGroupMove(event);
+                }else{
+                    this.game.viewMode = (this.game.viewMode * -1) + 1;
+                    this.game.grouper.identify();
+                    this.game.grouper.selectGroup(this.lastMouseEvent);
                 }
             }
             console.log(`Touch, y:${event.offsetY}`);

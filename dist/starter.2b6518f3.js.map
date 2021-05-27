@@ -1,0 +1,1 @@
+{"version":3,"sources":["src/starter.js"],"names":["startGame","console","log"],"mappings":";;;;;;;AAAO,SAASA,SAAT,GAAoB;AACvBC,EAAAA,OAAO,CAACC,GAAR,CAAY,QAAZ;AACH","file":"starter.2b6518f3.js","sourceRoot":"..","sourcesContent":["export function startGame(){\r\n    console.log(\"hello?\");\r\n}"]}

@@ -82,6 +82,10 @@ export default class Menu {
             this.game.level++;
             console.log(`Bounds successful, level: ${this.game.level}`);
             this.game.loadLevel(this.game.level);
+        }else if(this.game.gamestate == 3){
+            this.game.level++;
+            console.log(`Bounds successful, level: ${this.game.level}`);
+            this.game.loadLevel(this.game.level);
         }
     }
 }

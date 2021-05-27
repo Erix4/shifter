@@ -740,6 +740,12 @@ var InputHandler = function InputHandler(game) {
         console.log("selected group: " + _this.game.grouper.selectedGroup);
 
         _this.game.startGroupMove(event);
+      } else {
+        _this.game.viewMode = _this.game.viewMode * -1 + 1;
+
+        _this.game.grouper.identify();
+
+        _this.game.grouper.selectGroup(_this.lastMouseEvent);
       }
     }
 
@@ -884,6 +890,10 @@ var Menu = /*#__PURE__*/function () {
       //console.log(`X: ${event.offsetX}, Y: ${event.offsetY}`);
 
       if (event.offsetX > this.boundLeft && event.offsetX < this.boundRight && event.offsetY > this.boundTop && event.offsetY < this.boundBottom) {
+        this.game.level++;
+        console.log("Bounds successful, level: ".concat(this.game.level));
+        this.game.loadLevel(this.game.level);
+      } else if (this.game.gamestate == 3) {
         this.game.level++;
         console.log("Bounds successful, level: ".concat(this.game.level));
         this.game.loadLevel(this.game.level);
@@ -1364,20 +1374,47 @@ exports.default = Game;
 },{"./cell":"src/cell.js","./artist":"src/artist.js","./grouper":"src/grouper.js","./input":"src/input.js","./menu":"src/menu.js","./levels":"src/levels.js"}],"src/index.js":[function(require,module,exports) {
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.startGame = startGame;
+
 var _game = _interopRequireDefault(require("/src/game"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var canvas = document.getElementById("gameScreen");
 var ctx = canvas.getContext("2d");
-var GAME_WIDTH = window.innerWidth - 30;
-var GAME_HEIGHT = window.innerHeight - 30;
+var GAME_WIDTH = window.innerWidth - 22;
+var GAME_HEIGHT = window.innerHeight - 22;
 canvas.width = GAME_WIDTH;
 canvas.height = GAME_HEIGHT;
 var game = new _game.default(GAME_WIDTH, GAME_HEIGHT);
 game.start();
 ctx.clearRect(0, 0, 800, 800);
 var lastTime = 0;
+var whRatio = GAME_WIDTH / GAME_HEIGHT;
+var StartBt = document.getElementById("start");
+var title = document.getElementById("title");
+var menu = document.getElementById("menu");
+
+if (whRatio > 1.3) {
+  //horizontal
+  title.style.top = "-10%";
+  title.style.fontSize = GAME_WIDTH * .12 + "px";
+  StartBt.style.fontSize = GAME_WIDTH * .07 + "px";
+} else {
+  //vertical
+  var divWidth = whRatio * -70 + 135;
+  var divLeft = (100 - divWidth) / 2; //
+
+  title.style.top = "-15%";
+  menu.style.left = divLeft + "%";
+  menu.style.width = divWidth + "%"; //
+
+  title.style.fontSize = GAME_WIDTH * .004 * divWidth + "px";
+  StartBt.style.fontSize = GAME_WIDTH * .002 * divWidth + "px";
+}
 
 function gameLoop(timeStamp) {
   var deltaTime = timeStamp - lastTime;
@@ -1388,6 +1425,13 @@ function gameLoop(timeStamp) {
   game.draw(ctx); //
 
   requestAnimationFrame(gameLoop);
+}
+
+function startGame() {
+  game.level++;
+  console.log("Starting game");
+  game.loadLevel(this.game.level);
+  menu.style.visibility = "hidden";
 }
 
 requestAnimationFrame(gameLoop);

@@ -3,8 +3,9 @@
   <head>
     <title>Shifter</title>
     <meta charset="UTF-8" />
-
     <style>
+      @import url('https://fonts.googleapis.com/css2?family=Odibee+Sans&display=swap');
+
       #gameScreen {
         border: 1px solid black;
         font-family: 'Pacifico', cursive;
@@ -13,13 +14,77 @@
       img {
         display: none;
       }
+
+      button{
+        position: inherit;
+        bottom: 10%;
+        left: 10%;
+        width: 80%;
+        height: 30%;
+        background-color: white;
+        border-radius: 30px;
+        font-size: 500%;
+        font-family: 'Odibee Sans', cursive;
+        font-weight: bolder;
+        border: 5px solid #45e1f5;
+      }
+
+      button:hover{
+        background-color: #45e1f5;
+      }
+
+      button:active{
+        background-color: #ff7171;
+        border: #ff7171;
+        color: #45e1f5;
+      }
+
+      h1{
+        position: relative;
+        font-family: 'Odibee Sans', cursive;
+        font-size: 200px;
+        text-align: center;
+        color: #ff7171;
+      }
+
+      .popup{
+        position: absolute;
+        border-radius: 50px;
+      }
+
+      #menu{
+        top: 20%;
+        height: 60%;
+        left: 35%;
+        width: 30%;
+        background-image: linear-gradient(#f0e4d7, #ff7171);
+      }
     </style>
   </head>
 
   <body>
-    <!--<img id="image_ship" src="assets/triangle.png" />-->
-    <!--<div style="font-family: Pacifico;">.</div>-->
     <canvas id="gameScreen"></canvas>
+    <!--<script src="src/starter.js"></script>-->
+    <div id="menu" class="popup">
+      <h1 id="title">Shifter</h1>
+      <button id="start" onclick="callStartGame()">Start!</button>
+    </div>
     <script src="src/index.js"></script>
+    <script>
+      //import {startGame} from "/src/starter.js";
+      //
+      function callStartGame(){
+        //startGame();
+        //console.log("hello??");
+        document.getElementById("menu").style.visibility = "hidden";
+      }
+    </script>
+    <!--<script type="module">
+      //import {startGame} from "./src/index.js";
+      //
+      function callStartGame(){
+        //startGame();
+      }
+    </script>-->
   </body>
 </html>
