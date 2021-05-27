@@ -92,7 +92,7 @@ export default class Game {
                 break;
             //
             case GAMESTATE.START:
-                this.menu.drawStart(ctx);
+                //this.menu.drawStart(ctx);
                 break;
             case GAMESTATE.CREATE:
                 this.gameObjects.forEach(object => object.draw(ctx));
@@ -141,6 +141,7 @@ export default class Game {
     moveGroup(event){//move a selected group with the cursor's x or y
         let cx = Math.floor((event.offsetX - this.mouseStartX + (this.unit / 2)) / this.unit);
         let cy = Math.floor((event.offsetY - this.mouseStartY + (this.unit / 2)) / this.unit);
+        //console.log(`cx: ${cx}`);
         //
         var group = this.grouper.groups[this.grouper.selectedGroup]
         //console.log(group);
@@ -153,6 +154,7 @@ export default class Game {
             }else if(grStart + cx < 0){
                 cx = 0 - grStart;
             }
+            //console.log(`Moving: ${group}`);
             for (i = 2; i < group.length; i++){
                 this.cells[group[i]].move(cx, 0);
             }
@@ -169,7 +171,7 @@ export default class Game {
             this.grouper.groups[this.grouper.selectedGroup][1] = grStart + cy;
         }
         //
-        this.grouper.identify();
+        //this.grouper.identify();
     }
     //
     logInfo(){//log level info for level creation

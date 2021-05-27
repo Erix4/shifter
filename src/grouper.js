@@ -16,7 +16,7 @@ export default class Grouper{
         this.groups = new Array();
         //
         this.selectedGroup = this.inSize;
-        this.groupStart = 0;
+        this.groupStart = 0;//the cell where the selected group starts
     }
     //
     draw(ctx){
@@ -25,7 +25,7 @@ export default class Grouper{
         ctx.lineWidth = 5;
         ctx.strokeStyle = "#000000";
         //
-        this.identify();
+        //this.identify();
         //
         if(this.game.viewMode == 0){//rows
             this.groups.forEach((element, i) => {
@@ -95,7 +95,7 @@ export default class Grouper{
                             build++;
                         }else if(line == true){//line finished
                             if(build == this.inSize){//full 6 cell group
-                                this.groups.push([i, grStart].concat(cellList));//add group to list [row, cell start]
+                                this.groups.push([i, grStart].concat(cellList));//add group to list [row, cell start, cells]
                                 build = 0;
                                 break;
                             }else{//more or less than 6, move on
@@ -140,7 +140,7 @@ export default class Grouper{
     }
     //
     selectGroup(event){//identify group beneath cursor
-        //console.log("Reselecting group, viewmode: " + this.game.viewMode);
+        console.log("Reselecting group, viewmode: " + this.game.viewMode);
         //console.log("y input: " + event.offsetY);
         this.selectedGroup = this.inSize;
         if(this.game.viewMode == 0){//rows

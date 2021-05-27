@@ -75,14 +75,11 @@ export default class Menu {
         bounds.bottom = this.boundBottom;
         //console.table(bounds);
         //console.log(`X: ${event.offsetX}, Y: ${event.offsetY}`);
-        if(event.offsetX > this.boundLeft &&
+        if((event.offsetX > this.boundLeft &&
             event.offsetX < this.boundRight &&
             event.offsetY > this.boundTop &&
-            event.offsetY < this.boundBottom){
-            this.game.level++;
-            console.log(`Bounds successful, level: ${this.game.level}`);
-            this.game.loadLevel(this.game.level);
-        }else if(this.game.gamestate == 3){
+            event.offsetY < this.boundBottom)
+            || this.game.gamestate > 1){
             this.game.level++;
             console.log(`Bounds successful, level: ${this.game.level}`);
             this.game.loadLevel(this.game.level);

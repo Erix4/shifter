@@ -11,7 +11,7 @@ export default class InputHandler{
                 if(this.game.moving == this.game.inSize){
                     if(!this.touched){
                         this.game.grouper.selectGroup(event);
-                        console.log("Selecting group");
+                        //console.log("Selecting group");
                     }
                 }else{
                     this.game.moveGroup(event);
@@ -26,7 +26,7 @@ export default class InputHandler{
             if(!this.reverb){
                 if(this.game.gamestate > 0){
                     this.game.menu.checkNext(event);
-                    console.log("Identifying");
+                    //console.log("Identifying");
                     this.game.grouper.identify();
                     this.game.grouper.selectGroup(event);
                 }else if(this.game.grouper.selectedGroup != this.game.inSize){
@@ -115,7 +115,7 @@ export default class InputHandler{
             }
             //console.log("offset x: " + event.offsetX);
             this.lastMouseEvent = event;
-            console.log("touch moving");
+            //console.log("touch moving");
         });
         //
         document.addEventListener("touchend", event => {

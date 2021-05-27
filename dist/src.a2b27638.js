@@ -211,6 +211,7 @@ var Cell = /*#__PURE__*/function () {
       this.locIndex = this.outSize * this.y + this.x; //find new location index
 
       this.game.map[this.locIndex] = this.valIndex; //set new map location as cell value
+      //potential failure is second map set ^^, either locIndex is improperly set or something else, very rare
     } //
 
   }, {
@@ -403,7 +404,7 @@ var Grouper = /*#__PURE__*/function () {
     this.groups = new Array(); //
 
     this.selectedGroup = this.inSize;
-    this.groupStart = 0;
+    this.groupStart = 0; //the cell where the selected group starts
   } //
 
 
@@ -416,8 +417,8 @@ var Grouper = /*#__PURE__*/function () {
       //
       ctx.lineWidth = 5;
       ctx.strokeStyle = "#000000"; //
-
-      this.identify(); //
+      //this.identify();
+      //
 
       if (this.game.viewMode == 0) {
         //rows
@@ -498,7 +499,7 @@ var Grouper = /*#__PURE__*/function () {
                 //line finished
                 if (build == this.inSize) {
                   //full 6 cell group
-                  this.groups.push([i, grStart].concat(cellList)); //add group to list [row, cell start]
+                  this.groups.push([i, grStart].concat(cellList)); //add group to list [row, cell start, cells]
 
                   build = 0;
                   break;
@@ -564,8 +565,8 @@ var Grouper = /*#__PURE__*/function () {
       var _this2 = this;
 
       //identify group beneath cursor
-      //console.log("Reselecting group, viewmode: " + this.game.viewMode);
-      //console.log("y input: " + event.offsetY);
+      console.log("Reselecting group, viewmode: " + this.game.viewMode); //console.log("y input: " + event.offsetY);
+
       this.selectedGroup = this.inSize;
 
       if (this.game.viewMode == 0) {
@@ -630,9 +631,8 @@ var InputHandler = function InputHandler(game) {
     if (_this.game.gamestate == 0) {
       if (_this.game.moving == _this.game.inSize) {
         if (!_this.touched) {
-          _this.game.grouper.selectGroup(event);
+          _this.game.grouper.selectGroup(event); //console.log("Selecting group");
 
-          console.log("Selecting group");
         }
       } else {
         _this.game.moveGroup(event);
@@ -647,9 +647,8 @@ var InputHandler = function InputHandler(game) {
   document.addEventListener("mousedown", function (event) {
     if (!_this.reverb) {
       if (_this.game.gamestate > 0) {
-        _this.game.menu.checkNext(event);
+        _this.game.menu.checkNext(event); //console.log("Identifying");
 
-        console.log("Identifying");
 
         _this.game.grouper.identify();
 
@@ -766,8 +765,7 @@ var InputHandler = function InputHandler(game) {
     } //console.log("offset x: " + event.offsetX);
 
 
-    _this.lastMouseEvent = event;
-    console.log("touch moving");
+    _this.lastMouseEvent = event; //console.log("touch moving");
   }); //
 
   document.addEventListener("touchend", function (event) {
@@ -889,11 +887,7 @@ var Menu = /*#__PURE__*/function () {
       bounds.bottom = this.boundBottom; //console.table(bounds);
       //console.log(`X: ${event.offsetX}, Y: ${event.offsetY}`);
 
-      if (event.offsetX > this.boundLeft && event.offsetX < this.boundRight && event.offsetY > this.boundTop && event.offsetY < this.boundBottom) {
-        this.game.level++;
-        console.log("Bounds successful, level: ".concat(this.game.level));
-        this.game.loadLevel(this.game.level);
-      } else if (this.game.gamestate == 3) {
+      if (event.offsetX > this.boundLeft && event.offsetX < this.boundRight && event.offsetY > this.boundTop && event.offsetY < this.boundBottom || this.game.gamestate > 1) {
         this.game.level++;
         console.log("Bounds successful, level: ".concat(this.game.level));
         this.game.loadLevel(this.game.level);
@@ -1078,7 +1072,7 @@ var Game = /*#__PURE__*/function () {
         //
 
         case GAMESTATE.START:
-          this.menu.drawStart(ctx);
+          //this.menu.drawStart(ctx);
           break;
 
         case GAMESTATE.CREATE:
@@ -1146,7 +1140,8 @@ var Game = /*#__PURE__*/function () {
     value: function moveGroup(event) {
       //move a selected group with the cursor's x or y
       var cx = Math.floor((event.offsetX - this.mouseStartX + this.unit / 2) / this.unit);
-      var cy = Math.floor((event.offsetY - this.mouseStartY + this.unit / 2) / this.unit); //
+      var cy = Math.floor((event.offsetY - this.mouseStartY + this.unit / 2) / this.unit); //console.log(`cx: ${cx}`);
+      //
 
       var group = this.grouper.groups[this.grouper.selectedGroup]; //console.log(group);
 
@@ -1159,7 +1154,8 @@ var Game = /*#__PURE__*/function () {
           cx = this.outSize - this.inSize - grStart;
         } else if (grStart + cx < 0) {
           cx = 0 - grStart;
-        }
+        } //console.log(`Moving: ${group}`);
+
 
         for (i = 2; i < group.length; i++) {
           this.cells[group[i]].move(cx, 0);
@@ -1180,9 +1176,8 @@ var Game = /*#__PURE__*/function () {
 
         this.grouper.groups[this.grouper.selectedGroup][1] = grStart + cy;
       } //
+      //this.grouper.identify();
 
-
-      this.grouper.identify();
     } //
 
   }, {
