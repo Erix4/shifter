@@ -140,7 +140,7 @@ export default class Grouper{
     }
     //
     selectGroup(event){//identify group beneath cursor
-        console.log("Reselecting group, viewmode: " + this.game.viewMode);
+        //console.log("Reselecting group, viewmode: " + this.game.viewMode);
         //console.log("y input: " + event.offsetY);
         this.selectedGroup = this.inSize;
         if(this.game.viewMode == 0){//rows

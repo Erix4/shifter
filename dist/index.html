@@ -16,10 +16,9 @@
 
       button{
         position: inherit;
-        bottom: 10%;
         left: 10%;
         width: 80%;
-        height: 30%;
+        height: 15%;
         background-color: white;
         border-radius: 30px;
         font-size: 500%;
@@ -38,6 +37,18 @@
         color: #45e1f5;
       }
 
+      #play{
+        bottom: 46%;
+      }
+
+      #continue{
+        bottom: 27%;
+      }
+
+      #startOver{
+        bottom: 8%;
+      }
+
       h1{
         position: relative;
         font-family: 'Odibee Sans', cursive;
@@ -46,17 +57,32 @@
         color: #ff7171;
       }
 
+      #nice{
+        font-size: 170px;
+        top: -15%;
+        color: #f0e4d7;
+      }
+
       .popup{
         position: absolute;
         border-radius: 50px;
       }
 
       #menu{
+        top: 15%;
+        height: 70%;
+        left: 35%;
+        width: 30%;
+        background-image: linear-gradient(#f0e4d7, #ff7171);
+      }
+      
+      #won{
         top: 20%;
         height: 60%;
         left: 35%;
         width: 30%;
-        background-image: linear-gradient(#f0e4d7, #ff7171);
+        background-image: linear-gradient(#ff7171, #f0e4d7);
+        visibility: hidden;
       }</style>
   </head>
 
@@ -65,7 +91,14 @@
     <!--<script src="src/starter.js"></script>-->
     <div id="menu" class="popup">
       <h1 id="title">Shifter</h1>
-      <button id="start" onclick="callStartGame()">Start!</button>
+      <button id="play">Play</button>
+      <button id="continue">Continue</button>
+      <button id="startOver">Start Over</button>
+    </div>
+    <div id="won" class="popup">
+      <h1 id="nice">Congrats!</h1>
+      <button id="next">Next Level</button>
+      <button id="quit">Quit</button>
     </div>
     <script src="/src.a2b27638.js"></script>
     <script>//import {startGame} from "/src/starter.js";

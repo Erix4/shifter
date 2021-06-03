@@ -6,6 +6,37 @@ export default class InputHandler{
         //
         this.touched = false;
         this.reverb = false;//prevent second click on touch release
+        //
+        document.getElementById("play").addEventListener("click", event => {
+            document.getElementById("menu").style.visibility = "hidden";
+            this.game.level++;
+            this.game.gameMode = 0;//set to generated mode
+            this.game.loadLevel(this.game.level);
+            this.game.grouper.identify();
+            this.game.grouper.selectGroup(this.lastMouseEvent);
+        });
+        //
+        document.getElementById("continue").addEventListener("click", event => {
+            document.getElementById("menu").style.visibility = "hidden";
+            var cookieList = document.cookie.split("=");//decode cookie
+            this.game.level = cookieList[1];//get level value
+            console.log(`Cookie: ${document.cookie}, level: ${this.game.level}`);
+            this.game.gameMode = 1;//set to crafted mode
+            this.game.loadLevel(this.game.level);
+            this.game.grouper.identify();
+            this.game.grouper.selectGroup(this.lastMouseEvent);
+        });
+        //
+        document.getElementById("startOver").addEventListener("click", event => {
+            document.getElementById("menu").style.visibility = "hidden";
+            this.game.level++;
+            this.game.gameMode = 1;//set to crafted mode
+            document.cookie = `level=0`;
+            this.game.loadLevel(this.game.level);
+            this.game.grouper.identify();
+            this.game.grouper.selectGroup(this.lastMouseEvent);
+        });
+        //
         document.addEventListener("mousemove", event => {
             if(this.game.gamestate == 0){
                 if(this.game.moving == this.game.inSize){
@@ -17,6 +48,7 @@ export default class InputHandler{
                     this.game.moveGroup(event);
                 }
             }
+            //this.game.grouper.identify();
             //console.log("offset x: " + event.offsetX);
             this.lastMouseEvent = event;
             this.touched = false;
@@ -24,7 +56,7 @@ export default class InputHandler{
         //
         document.addEventListener("mousedown", event => {
             if(!this.reverb){
-                if(this.game.gamestate > 0){
+                if(this.game.gamestate == 1 || this.game.gamestate == 2){
                     this.game.menu.checkNext(event);
                     //console.log("Identifying");
                     this.game.grouper.identify();
@@ -64,9 +96,13 @@ export default class InputHandler{
                             break;
                         case 3:
                             this.game.level++;
+                            document.getElementById("menu").style.visibility = "hidden";
+                            this.game.gameMode = 0;
                             this.game.loadLevel(this.game.level);
                             this.game.grouper.identify();
-                            this.game.grouper.selectGroup(this.lastMouseEvent);
+                            if(this.lastMouseEvent != null){
+                                this.game.grouper.selectGroup(this.lastMouseEvent);
+                            }
                             break;
                     }
                     break;
@@ -91,7 +127,7 @@ export default class InputHandler{
             }else{
                 this.game.grouper.selectGroup(event);
                 if(this.game.grouper.selectedGroup != this.game.inSize){
-                    console.log("selected group: " + this.game.grouper.selectedGroup);
+                    //console.log("selected group: " + this.game.grouper.selectedGroup);
                     this.game.startGroupMove(event);
                 }else{
                     this.game.viewMode = (this.game.viewMode * -1) + 1;
@@ -99,7 +135,7 @@ export default class InputHandler{
                     this.game.grouper.selectGroup(this.lastMouseEvent);
                 }
             }
-            console.log(`Touch, y:${event.offsetY}`);
+            //console.log(`Touch, y:${event.offsetY}`);
             this.touched = true;
         });
         //
@@ -125,9 +161,19 @@ export default class InputHandler{
             event.offsetX = 0;
             event.offsetY = 0;
             this.game.grouper.selectGroup(event);
-            console.log("group cleared");
+            //console.log("group cleared");
             this.reverb = true;
         });
     }
     //
+    buttonDet(event, rect1){
+        if(event.offsetX > rect1.left &&
+            event.offsetX < rect1.right &&
+            event.offsetY > rect1.top &&
+            event.offsetY < rect1.bottom){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }

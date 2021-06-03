@@ -49,6 +49,9 @@ export default class Artist{
                     break;
             }
             ctx.fill();
+            //ctx.font = '20px "Arial"';
+            //ctx.fillStyle = "black";
+            //ctx.fillText(`${element.valIndex.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false})}, ${element.locIndex}`, this.xStart + (element.x * this.unit) + 10, this.yStart + ((element.y + 1) * this.unit) - 20);
         });
         //
         ctx.beginPath();

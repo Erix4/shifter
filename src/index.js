@@ -23,19 +23,19 @@ let title = document.getElementById("title");
 let menu = document.getElementById("menu");
 
 if(whRatio > 1.3){//horizontal
-    title.style.top = "-10%";
+    title.style.top = "-15%";
     title.style.fontSize = (GAME_WIDTH * .12) + "px"; 
-StartBt.style.fontSize = (GAME_WIDTH * .07) + "px";
+    //StartBt.style.fontSize = (GAME_WIDTH * .07) + "px";
 }else{//vertical
     let divWidth = (whRatio * -70) + 135;
     let divLeft = (100 - divWidth) / 2;
     //
-    title.style.top = "-15%";
+    title.style.top = "-20%";
     menu.style.left = divLeft + "%";
     menu.style.width = divWidth + "%";
     //
     title.style.fontSize = (GAME_WIDTH * .004 * divWidth) + "px"; 
-    StartBt.style.fontSize = (GAME_WIDTH * .002 * divWidth) + "px";
+    //StartBt.style.fontSize = (GAME_WIDTH * .002 * divWidth) + "px";
 }
 
 function gameLoop(timeStamp) {
@@ -47,13 +47,6 @@ function gameLoop(timeStamp) {
     game.draw(ctx);
     //
     requestAnimationFrame(gameLoop);
-}
-
-export function startGame(){
-    game.level++;
-    console.log(`Starting game`);
-    game.loadLevel(this.game.level);
-    menu.style.visibility = "hidden";
 }
 
 requestAnimationFrame(gameLoop);

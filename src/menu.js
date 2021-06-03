@@ -81,6 +81,10 @@ export default class Menu {
             event.offsetY < this.boundBottom)
             || this.game.gamestate > 1){
             this.game.level++;
+            if(this.game.gameMode == 1){
+                document.cookie = `level=${this.game.level}`;
+                console.log(`Cookie set, level: ${this.game.level}`);
+            }
             console.log(`Bounds successful, level: ${this.game.level}`);
             this.game.loadLevel(this.game.level);
         }

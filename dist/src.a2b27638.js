@@ -209,11 +209,15 @@ var Cell = /*#__PURE__*/function () {
       if (this.game.map[this.locIndex] == this.valIndex) {
         //check that old map location hasn't already been changed
         this.game.map[this.locIndex] = this.inCap; //set old map location as default
+
+        console.log("Deleting cell at ".concat(this.locIndex));
       }
 
       this.locIndex = this.outSize * this.y + this.x; //find new location index
 
       this.game.map[this.locIndex] = this.valIndex; //set new map location as cell value
+
+      console.log("Moving cell ".concat(this.valIndex, " to ").concat(this.locIndex, ", from (").concat(this.orx, ", ").concat(this.ory, ") to (").concat(this.x, ", ").concat(this.y, ")")); //new location index calculation is sometimes wrong
     } //
 
   }, {
@@ -314,7 +318,9 @@ var Artist = /*#__PURE__*/function () {
             break;
         }
 
-        ctx.fill();
+        ctx.fill(); //ctx.font = '20px "Arial"';
+        //ctx.fillStyle = "black";
+        //ctx.fillText(`${element.valIndex.toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false})}, ${element.locIndex}`, this.xStart + (element.x * this.unit) + 10, this.yStart + ((element.y + 1) * this.unit) - 20);
       }); //
 
       ctx.beginPath();
@@ -567,8 +573,8 @@ var Grouper = /*#__PURE__*/function () {
       var _this2 = this;
 
       //identify group beneath cursor
-      console.log("Reselecting group, viewmode: " + this.game.viewMode); //console.log("y input: " + event.offsetY);
-
+      //console.log("Reselecting group, viewmode: " + this.game.viewMode);
+      //console.log("y input: " + event.offsetY);
       this.selectedGroup = this.inSize;
 
       if (this.game.viewMode == 0) {
@@ -617,174 +623,240 @@ exports.default = void 0;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 //need to rebuild this
-var InputHandler = function InputHandler(game) {
-  var _this = this;
+var InputHandler = /*#__PURE__*/function () {
+  function InputHandler(game) {
+    var _this = this;
 
-  _classCallCheck(this, InputHandler);
+    _classCallCheck(this, InputHandler);
 
-  this.game = game;
-  this.lastMouseEvent = null; //
+    this.game = game;
+    this.lastMouseEvent = null; //
 
-  this.touched = false;
-  this.reverb = false; //prevent second click on touch release
+    this.touched = false;
+    this.reverb = false; //prevent second click on touch release
+    //
 
-  document.addEventListener("mousemove", function (event) {
-    if (_this.game.gamestate == 0) {
-      if (_this.game.moving == _this.game.inSize) {
-        if (!_this.touched) {
-          _this.game.grouper.selectGroup(event); //console.log("Selecting group");
+    document.getElementById("play").addEventListener("click", function (event) {
+      document.getElementById("menu").style.visibility = "hidden";
+      _this.game.level++;
+      _this.game.gameMode = 0; //set to generated mode
 
+      _this.game.loadLevel(_this.game.level);
+
+      _this.game.grouper.identify();
+
+      _this.game.grouper.selectGroup(_this.lastMouseEvent);
+    }); //
+
+    document.getElementById("continue").addEventListener("click", function (event) {
+      document.getElementById("menu").style.visibility = "hidden";
+      var cookieList = document.cookie.split("="); //decode cookie
+
+      _this.game.level = cookieList[1]; //get level value
+
+      console.log("Cookie: ".concat(document.cookie, ", level: ").concat(_this.game.level));
+      _this.game.gameMode = 1; //set to crafted mode
+
+      _this.game.loadLevel(_this.game.level);
+
+      _this.game.grouper.identify();
+
+      _this.game.grouper.selectGroup(_this.lastMouseEvent);
+    }); //
+
+    document.getElementById("startOver").addEventListener("click", function (event) {
+      document.getElementById("menu").style.visibility = "hidden";
+      _this.game.level++;
+      _this.game.gameMode = 1; //set to crafted mode
+
+      document.cookie = "level=0";
+
+      _this.game.loadLevel(_this.game.level);
+
+      _this.game.grouper.identify();
+
+      _this.game.grouper.selectGroup(_this.lastMouseEvent);
+    }); //
+
+    document.addEventListener("mousemove", function (event) {
+      if (_this.game.gamestate == 0) {
+        if (_this.game.moving == _this.game.inSize) {
+          if (!_this.touched) {
+            _this.game.grouper.selectGroup(event); //console.log("Selecting group");
+
+          }
+        } else {
+          _this.game.moveGroup(event);
+        }
+      } //this.game.grouper.identify();
+      //console.log("offset x: " + event.offsetX);
+
+
+      _this.lastMouseEvent = event;
+      _this.touched = false;
+    }); //
+
+    document.addEventListener("mousedown", function (event) {
+      if (!_this.reverb) {
+        if (_this.game.gamestate == 1 || _this.game.gamestate == 2) {
+          _this.game.menu.checkNext(event); //console.log("Identifying");
+
+
+          _this.game.grouper.identify();
+
+          _this.game.grouper.selectGroup(event);
+        } else if (_this.game.grouper.selectedGroup != _this.game.inSize) {
+          _this.game.startGroupMove(event);
         }
       } else {
-        _this.game.moveGroup(event);
+        _this.reverb = false;
       }
-    } //console.log("offset x: " + event.offsetX);
+    }); //
 
+    document.addEventListener("keydown", function (event) {
+      switch (event.key) {
+        case " ":
+          if (_this.game.gamestate == 0) {
+            _this.game.viewMode = _this.game.viewMode * -1 + 1; //console.log(`Command registered, viewMode: ${this.game.viewMode}`);
+            //console.log("offset x: " + this.lastMouseEvent.offsetX);
 
-    _this.lastMouseEvent = event;
-    _this.touched = false;
-  }); //
+            _this.game.grouper.identify();
 
-  document.addEventListener("mousedown", function (event) {
-    if (!_this.reverb) {
+            _this.game.grouper.selectGroup(_this.lastMouseEvent);
+          }
+
+          break;
+
+        case "Enter":
+          switch (_this.game.gamestate) {
+            case 0:
+              _this.game.logInfo();
+
+              break;
+
+            case 1:
+              _this.game.level++;
+
+              _this.game.loadLevel(_this.game.level);
+
+              _this.game.grouper.identify();
+
+              _this.game.grouper.selectGroup(_this.lastMouseEvent);
+
+              break;
+
+            case 2:
+              _this.game.gamestate = 1;
+              break;
+
+            case 3:
+              _this.game.level++;
+              document.getElementById("menu").style.visibility = "hidden";
+              _this.game.gameMode = 0;
+
+              _this.game.loadLevel(_this.game.level);
+
+              _this.game.grouper.identify();
+
+              if (_this.lastMouseEvent != null) {
+                _this.game.grouper.selectGroup(_this.lastMouseEvent);
+              }
+
+              break;
+          }
+
+          break;
+
+        case "Backspace":
+          _this.game.loadLevel(_this.game.level);
+
+          break;
+      }
+    }); //
+
+    document.addEventListener("mouseup", function (event) {
+      if (_this.game.moving != _this.game.inSize) {
+        _this.game.stopGroupMove();
+      }
+    }); //
+
+    document.addEventListener("touchstart", function (event) {
+      event.offsetX = event.touches[0].pageX;
+      event.offsetY = event.touches[0].pageY;
+
       if (_this.game.gamestate > 0) {
-        _this.game.menu.checkNext(event); //console.log("Identifying");
-
+        _this.game.menu.checkNext(event);
 
         _this.game.grouper.identify();
-
+      } else {
         _this.game.grouper.selectGroup(event);
-      } else if (_this.game.grouper.selectedGroup != _this.game.inSize) {
-        _this.game.startGroupMove(event);
-      }
-    } else {
-      _this.reverb = false;
-    }
-  }); //
 
-  document.addEventListener("keydown", function (event) {
-    switch (event.key) {
-      case " ":
-        if (_this.game.gamestate == 0) {
-          _this.game.viewMode = _this.game.viewMode * -1 + 1; //console.log(`Command registered, viewMode: ${this.game.viewMode}`);
-          //console.log("offset x: " + this.lastMouseEvent.offsetX);
+        if (_this.game.grouper.selectedGroup != _this.game.inSize) {
+          //console.log("selected group: " + this.game.grouper.selectedGroup);
+          _this.game.startGroupMove(event);
+        } else {
+          _this.game.viewMode = _this.game.viewMode * -1 + 1;
 
           _this.game.grouper.identify();
 
           _this.game.grouper.selectGroup(_this.lastMouseEvent);
         }
+      } //console.log(`Touch, y:${event.offsetY}`);
 
-        break;
 
-      case "Enter":
-        switch (_this.game.gamestate) {
-          case 0:
-            _this.game.logInfo();
+      _this.touched = true;
+    }); //
 
-            break;
+    document.addEventListener("touchmove", function (event) {
+      event.offsetX = event.touches[event.touches.length - 1].pageX;
+      event.offsetY = event.touches[event.touches.length - 1].pageY;
 
-          case 1:
-            _this.game.level++;
-
-            _this.game.loadLevel(_this.game.level);
-
-            _this.game.grouper.identify();
-
-            _this.game.grouper.selectGroup(_this.lastMouseEvent);
-
-            break;
-
-          case 2:
-            _this.game.gamestate = 1;
-            break;
-
-          case 3:
-            _this.game.level++;
-
-            _this.game.loadLevel(_this.game.level);
-
-            _this.game.grouper.identify();
-
-            _this.game.grouper.selectGroup(_this.lastMouseEvent);
-
-            break;
+      if (_this.game.gamestate == 0) {
+        if (_this.game.moving == _this.game.inSize) {
+          _this.game.grouper.selectGroup(event);
+        } else {
+          _this.game.moveGroup(event);
         }
+      } //console.log("offset x: " + event.offsetX);
 
-        break;
 
-      case "Backspace":
-        _this.game.loadLevel(_this.game.level);
+      _this.lastMouseEvent = event; //console.log("touch moving");
+    }); //
 
-        break;
-    }
-  }); //
+    document.addEventListener("touchend", function (event) {
+      if (_this.game.moving != _this.game.inSize) {
+        _this.game.stopGroupMove();
+      }
 
-  document.addEventListener("mouseup", function (event) {
-    if (_this.game.moving != _this.game.inSize) {
-      _this.game.stopGroupMove();
-    }
-  }); //
+      event.offsetX = 0;
+      event.offsetY = 0;
 
-  document.addEventListener("touchstart", function (event) {
-    event.offsetX = event.touches[0].pageX;
-    event.offsetY = event.touches[0].pageY;
+      _this.game.grouper.selectGroup(event); //console.log("group cleared");
 
-    if (_this.game.gamestate > 0) {
-      _this.game.menu.checkNext(event);
 
-      _this.game.grouper.identify();
-    } else {
-      _this.game.grouper.selectGroup(event);
+      _this.reverb = true;
+    });
+  } //
 
-      if (_this.game.grouper.selectedGroup != _this.game.inSize) {
-        console.log("selected group: " + _this.game.grouper.selectedGroup);
 
-        _this.game.startGroupMove(event);
+  _createClass(InputHandler, [{
+    key: "buttonDet",
+    value: function buttonDet(event, rect1) {
+      if (event.offsetX > rect1.left && event.offsetX < rect1.right && event.offsetY > rect1.top && event.offsetY < rect1.bottom) {
+        return true;
       } else {
-        _this.game.viewMode = _this.game.viewMode * -1 + 1;
-
-        _this.game.grouper.identify();
-
-        _this.game.grouper.selectGroup(_this.lastMouseEvent);
+        return false;
       }
     }
+  }]);
 
-    console.log("Touch, y:".concat(event.offsetY));
-    _this.touched = true;
-  }); //
-
-  document.addEventListener("touchmove", function (event) {
-    event.offsetX = event.touches[event.touches.length - 1].pageX;
-    event.offsetY = event.touches[event.touches.length - 1].pageY;
-
-    if (_this.game.gamestate == 0) {
-      if (_this.game.moving == _this.game.inSize) {
-        _this.game.grouper.selectGroup(event);
-      } else {
-        _this.game.moveGroup(event);
-      }
-    } //console.log("offset x: " + event.offsetX);
-
-
-    _this.lastMouseEvent = event; //console.log("touch moving");
-  }); //
-
-  document.addEventListener("touchend", function (event) {
-    if (_this.game.moving != _this.game.inSize) {
-      _this.game.stopGroupMove();
-    }
-
-    event.offsetX = 0;
-    event.offsetY = 0;
-
-    _this.game.grouper.selectGroup(event);
-
-    console.log("group cleared");
-    _this.reverb = true;
-  });
-} //
-;
+  return InputHandler;
+}();
 
 exports.default = InputHandler;
 },{}],"src/menu.js":[function(require,module,exports) {
@@ -891,6 +963,12 @@ var Menu = /*#__PURE__*/function () {
 
       if (event.offsetX > this.boundLeft && event.offsetX < this.boundRight && event.offsetY > this.boundTop && event.offsetY < this.boundBottom || this.game.gamestate > 1) {
         this.game.level++;
+
+        if (this.game.gameMode == 1) {
+          document.cookie = "level=".concat(this.game.level);
+          console.log("Cookie set, level: ".concat(this.game.level));
+        }
+
         console.log("Bounds successful, level: ".concat(this.game.level));
         this.game.loadLevel(this.game.level);
       }
@@ -996,6 +1074,8 @@ var Game = /*#__PURE__*/function () {
       //
 
       this.level = -1; //current level
+
+      this.gameMode = 0; //0 = generated, 1 = crafted
       //
 
       var i;
@@ -1019,8 +1099,6 @@ var Game = /*#__PURE__*/function () {
         this.map[temp.locIndex] = i;
         this.goalMap[temp.locIndex] = temp.state; //this is fine, since the puzzle is generated in a win state by default
       } //
-      //console.log(this.map);
-      //
 
 
       this.artist = new _artist.default(this); //draw grid and tiles
@@ -1056,7 +1134,7 @@ var Game = /*#__PURE__*/function () {
           });
           ctx.font = '20px "Pixeled"';
           ctx.fillStyle = "black";
-          ctx.fillText("level: " + (this.level + 1), 10, 20);
+          ctx.fillText("level: " + (parseInt(this.level) + 1), 10, 20);
           break;
         //
 
@@ -1112,10 +1190,23 @@ var Game = /*#__PURE__*/function () {
     key: "startGroupMove",
     value: function startGroupMove(event) {
       //start moving a group, remember mouse start
+      var cellCoords = "Cells at ";
+      var group = this.grouper.groups[this.grouper.selectedGroup];
+
+      for (var i = 2; i < group.length; i++) {
+        var curCell = this.cells[group[i]];
+        cellCoords += "(".concat(curCell.x, ", ").concat(curCell.y, ")-(").concat(curCell.orx, ", ").concat(curCell.ory, "), ");
+      }
+
+      console.log(cellCoords); //
+
+      this.grouper.identify();
+      this.grouper.selectGroup(event);
       this.moving = this.grouper.selectedGroup;
       this.mouseStartX = event.offsetX;
       this.mouseStartY = event.offsetY;
       this.grouper.groupStart = this.grouper.groups[this.grouper.selectedGroup][1];
+      console.log("Start move, mode ".concat(this.viewMode));
     } //
 
   }, {
@@ -1133,6 +1224,7 @@ var Game = /*#__PURE__*/function () {
       if (this.checkCompletion() && this.gamestate != GAMESTATE.CREATE) {
         this.gamestate = GAMESTATE.WON;
         this.grouper.selectedGroup = this.inSize;
+        document.getElementById("won").style.visibility = "visible";
         console.log("Gamestate changed to: 'WON'");
       }
     } //
@@ -1144,8 +1236,9 @@ var Game = /*#__PURE__*/function () {
       var cx = Math.floor((event.offsetX - this.mouseStartX + this.unit / 2) / this.unit);
       var cy = Math.floor((event.offsetY - this.mouseStartY + this.unit / 2) / this.unit); //
 
-      var group = this.grouper.groups[this.grouper.selectedGroup]; //console.log(group);
+      var group = this.grouper.groups[this.grouper.selectedGroup]; //correct group selected
 
+      console.log(group);
       var i;
       var grStart = this.grouper.groupStart; //console.log(grStart);
 
@@ -1196,62 +1289,66 @@ var Game = /*#__PURE__*/function () {
       var _this = this;
 
       //load level into grid based on level index (key)
-      this.moving = this.inSize;
-      /*if(key >= lvs.length){//check level exists
+      this.moving = this.inSize; //
+
+      if (this.gameMode == 1) {
+        //crafted mode
+        if (key >= _levels.lvs.length) {
+          //check level exists
           console.log("Load command failed, level does not exist");
           this.level--;
-      }else if(lvs[key].length < 4){//check that a map exists
+        } else if (_levels.lvs[key].length < 4) {
+          //check that a map exists
           console.log("Load command failed, level is corrupted");
           this.level--;
-      }else */
+        } else {
+          var level = _levels.lvs[key]; //reset variables
 
-      if (this.level < 6) {
-        //6
-        var level = _levels.lvs[key]; //reset variables
+          console.log("Load command registered, level index: " + key);
+          this.inSize = level[0]; //goal grid size
 
-        console.log("Load command registered, level index: " + key);
-        this.inSize = level[0]; //goal grid size
+          this.outSize = level[1]; //total grid size
 
-        this.outSize = level[1]; //total grid size
+          this.offset = Math.floor((this.outSize - this.inSize) / 2); //goal grid offset from top left
 
-        this.offset = Math.floor((this.outSize - this.inSize) / 2); //goal grid offset from top left
+          this.colors = level[2]; //# of colors used
 
-        this.colors = level[2]; //# of colors used
+          this.pattern = level[3]; //pattern of colors used (passed into cell, which determines own color)
 
-        this.pattern = level[3]; //pattern of colors used (passed into cell, which determines own color)
+          this.inCap = this.inSize * this.inSize;
+          this.outCap = this.outSize * this.outSize; //
 
-        this.inCap = this.inSize * this.inSize;
-        this.outCap = this.outSize * this.outSize; //
+          this.gamestate = GAMESTATE.RUNNING;
+          console.log("Gamestate changed to: 'RUNNING'"); //
 
-        this.gamestate = GAMESTATE.RUNNING;
-        console.log("Gamestate changed to: 'RUNNING'"); //
+          this.cells = [];
+          this.goalMap = Array(this.outCap).fill(this.colors); //reset goal map to default values
 
-        this.cells = [];
-        this.goalMap = Array(this.outCap).fill(this.colors); //reset goal map to default values
+          var i;
 
-        var i;
-
-        for (i = 0; i < this.inCap; i++) {
-          //fill in goal values for every generated cell in the goal map
-          this.cells.push(new _cell.default(this, i));
-          this.goalMap[this.cells[i].locIndex] = this.cells[i].state;
-        } //console.log(this.goalMap);
-        //
+          for (i = 0; i < this.inCap; i++) {
+            //fill in goal values for every generated cell in the goal map
+            this.cells.push(new _cell.default(this, i));
+            this.goalMap[this.cells[i].locIndex] = this.cells[i].state;
+          } //console.log(this.goalMap);
+          //
 
 
-        this.map = level.slice(4, level.length - 1); //set the current map to the saved level input
+          this.map = level.slice(4, level.length - 1); //set the current map to the saved level input
 
-        this.map.forEach(function (element, i) {
-          //loop through map
-          if (element != _this.inCap) {
-            //when cell is filled it carries the index of its filler cell
-            _this.cells[element].setLocation(i); //update cell object's location
+          this.map.forEach(function (element, i) {
+            //loop through map
+            if (element != _this.inCap) {
+              //when cell is filled it carries the index of its filler cell
+              _this.cells[element].setLocation(i); //update cell object's location
 
-          }
-        });
+            }
+          });
+        }
       } else {
+        //generated mode
         //var level = lvs[key];//reset variables
-        console.log("Load command registered, generating level.");
+        console.log("Load command registered, generating level");
         this.inSize = 6; //goal grid size
 
         this.outSize = 12; //total grid size
@@ -1288,7 +1385,7 @@ var Game = /*#__PURE__*/function () {
         console.log("Complete, randomizing switches...");
         this.stopOdds = this.level; //# of loops until chances are 50/50 for stopping
 
-        for (i = 0; Math.random() > i / (i + this.stopOdds); i++) {
+        for (i = 0; Math.random() > i / (i + this.stopOdds) || this.checkCompletion(); i++) {
           //switch cells for a random number of loops
           var ranCell1 = this.cells[Math.floor(this.inCap * Math.random())];
           var ranCell2 = this.cells[Math.floor(this.inCap * Math.random())];
@@ -1372,11 +1469,6 @@ exports.default = Game;
 },{"./cell":"src/cell.js","./artist":"src/artist.js","./grouper":"src/grouper.js","./input":"src/input.js","./menu":"src/menu.js","./levels":"src/levels.js"}],"src/index.js":[function(require,module,exports) {
 "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.startGame = startGame;
-
 var _game = _interopRequireDefault(require("/src/game"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -1398,20 +1490,18 @@ var menu = document.getElementById("menu");
 
 if (whRatio > 1.3) {
   //horizontal
-  title.style.top = "-10%";
-  title.style.fontSize = GAME_WIDTH * .12 + "px";
-  StartBt.style.fontSize = GAME_WIDTH * .07 + "px";
+  title.style.top = "-15%";
+  title.style.fontSize = GAME_WIDTH * .12 + "px"; //StartBt.style.fontSize = (GAME_WIDTH * .07) + "px";
 } else {
   //vertical
   var divWidth = whRatio * -70 + 135;
   var divLeft = (100 - divWidth) / 2; //
 
-  title.style.top = "-15%";
+  title.style.top = "-20%";
   menu.style.left = divLeft + "%";
   menu.style.width = divWidth + "%"; //
 
-  title.style.fontSize = GAME_WIDTH * .004 * divWidth + "px";
-  StartBt.style.fontSize = GAME_WIDTH * .002 * divWidth + "px";
+  title.style.fontSize = GAME_WIDTH * .004 * divWidth + "px"; //StartBt.style.fontSize = (GAME_WIDTH * .002 * divWidth) + "px";
 }
 
 function gameLoop(timeStamp) {
@@ -1423,13 +1513,6 @@ function gameLoop(timeStamp) {
   game.draw(ctx); //
 
   requestAnimationFrame(gameLoop);
-}
-
-function startGame() {
-  game.level++;
-  console.log("Starting game");
-  game.loadLevel(this.game.level);
-  menu.style.visibility = "hidden";
 }
 
 requestAnimationFrame(gameLoop);
@@ -1461,7 +1544,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59379" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60999" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -50,9 +50,11 @@ export default class Cell{
         //
         if(this.game.map[this.locIndex] == this.valIndex){//check that old map location hasn't already been changed
             this.game.map[this.locIndex] = this.inCap;//set old map location as default
+            console.log(`Deleting cell at ${this.locIndex}`);
         }
         this.locIndex = (this.outSize * this.y) + this.x;//find new location index
         this.game.map[this.locIndex] = this.valIndex;//set new map location as cell value
+        console.log(`Moving cell ${this.valIndex} to ${this.locIndex}, from (${this.orx}, ${this.ory}) to (${this.x}, ${this.y})`);//new location index calculation is sometimes wrong
     }
     //
     resetOrigin(){
