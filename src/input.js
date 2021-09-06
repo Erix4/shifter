@@ -37,6 +37,14 @@ export default class InputHandler{
             this.game.grouper.selectGroup(this.lastMouseEvent);
         });
         //
+        document.getElementById("next").addEventListener("click", event => {
+            document.getElementById("won").style.visibility = "hidden";
+            this.game.level++;
+            this.game.loadLevel(this.game.level);
+            this.game.grouper.identify();
+            this.game.grouper.selectGroup(this.lastMouseEvent);
+        });
+        //
         document.addEventListener("mousemove", event => {
             if(this.game.gamestate == 0){
                 if(this.game.moving == this.game.inSize){

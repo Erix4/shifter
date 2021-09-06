@@ -683,6 +683,17 @@ var InputHandler = /*#__PURE__*/function () {
       _this.game.grouper.selectGroup(_this.lastMouseEvent);
     }); //
 
+    document.getElementById("next").addEventListener("click", function (event) {
+      document.getElementById("won").style.visibility = "hidden";
+      _this.game.level++;
+
+      _this.game.loadLevel(_this.game.level);
+
+      _this.game.grouper.identify();
+
+      _this.game.grouper.selectGroup(_this.lastMouseEvent);
+    }); //
+
     document.addEventListener("mousemove", function (event) {
       if (_this.game.gamestate == 0) {
         if (_this.game.moving == _this.game.inSize) {
@@ -1544,7 +1555,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60999" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64187" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
