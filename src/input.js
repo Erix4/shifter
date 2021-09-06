@@ -155,7 +155,7 @@ export default class InputHandler{
                 }else{
                     this.game.viewMode = (this.game.viewMode * -1) + 1;
                     this.game.grouper.identify();
-                    this.game.grouper.selectGroup(this.lastMouseEvent);
+                    //this.game.grouper.selectGroup(this.lastMouseEvent);
                 }
             }
             //console.log(`Touch, y:${event.offsetY}`);

@@ -826,9 +826,8 @@ var InputHandler = /*#__PURE__*/function () {
         } else {
           _this.game.viewMode = _this.game.viewMode * -1 + 1;
 
-          _this.game.grouper.identify();
+          _this.game.grouper.identify(); //this.game.grouper.selectGroup(this.lastMouseEvent);
 
-          _this.game.grouper.selectGroup(_this.lastMouseEvent);
         }
       } //console.log(`Touch, y:${event.offsetY}`);
 
