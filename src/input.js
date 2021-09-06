@@ -7,6 +7,13 @@ export default class InputHandler{
         this.touched = false;
         this.reverb = false;//prevent second click on touch release
         //
+        document.body.addEventListener('touchmove', function(event) {//remove rubber banding
+            event.preventDefault();
+          }, {
+            passive: false,
+            useCapture: false
+          });
+        //
         document.getElementById("play").addEventListener("click", event => {
             document.getElementById("menu").style.visibility = "hidden";
             this.game.level = 0;

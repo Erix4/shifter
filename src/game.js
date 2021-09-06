@@ -67,7 +67,7 @@ export default class Game {
         //
         this.unit = this.artist.unit;//px length for each cell
         //
-        new InputHandler(this);//handle key and mouse inputs
+        this.inputer = new InputHandler(this);//handle key and mouse inputs
         this.menu = new Menu(this);//draw for WON and MENU gamestates
         //
         this.smallFont = this.menu.fontSize / 2;
@@ -209,10 +209,20 @@ export default class Game {
             //
             if(key >= lvs.length){//check level exists
                 console.log("Load command failed, level does not exist");
-                this.level--;
+                //this.level--;
+                this.level = 0;
+                this.gameMode = 0;//set to generated mode
+                this.loadLevel(this.level);
+                this.grouper.identify();
+                this.grouper.selectGroup(this.inputer.lastMouseEvent);
             }else if(lvs[key].length < 4){//check that a map exists
                 console.log("Load command failed, level is corrupted");
-                this.level--;
+                //this.level--;
+                this.level = 0;
+                this.gameMode = 0;//set to generated mode
+                this.loadLevel(this.level);
+                this.grouper.identify();
+                this.grouper.selectGroup(this.inputer.lastMouseEvent);
             }else {
                 var level = lvs[key];//reset variables
                 console.log("Load command registered, level index: " + key);

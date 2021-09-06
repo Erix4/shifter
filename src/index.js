@@ -21,6 +21,9 @@ let whRatio = GAME_WIDTH / GAME_HEIGHT;
 let StartBt = document.getElementById("start");
 let title = document.getElementById("title");
 let menu = document.getElementById("menu");
+let won = document.getElementById("won");
+let nice = document.getElementById("nice");
+let quit = document.getElementById("quit");
 
 var cookieList = document.cookie.split("=");//decode cookie
 if(cookieList[1] < 1 || cookieList [2] == 0){
@@ -29,17 +32,25 @@ if(cookieList[1] < 1 || cookieList [2] == 0){
 
 if(whRatio > 1.3){//horizontal
     title.style.top = "-15%";
+    nice.style.top = "-10%";
     title.style.fontSize = (GAME_WIDTH * .12) + "px"; 
+    nice.style.fontSize = (GAME_WIDTH * .10) + "px"; 
     //StartBt.style.fontSize = (GAME_WIDTH * .07) + "px";
 }else{//vertical
     let divWidth = (whRatio * -70) + 135;
     let divLeft = (100 - divWidth) / 2;
     //
     title.style.top = "-20%";
+    nice.style.top = "-10%";
     menu.style.left = divLeft + "%";
     menu.style.width = divWidth + "%";
+    won.style.left = divLeft + "%";
+    won.style.width = divWidth + "%";
+    //
+    //quit.style.
     //
     title.style.fontSize = (GAME_WIDTH * .004 * divWidth) + "px"; 
+    nice.style.fontSize = (GAME_WIDTH * .003 * divWidth) + "px"; 
     //StartBt.style.fontSize = (GAME_WIDTH * .002 * divWidth) + "px";
 }
 

@@ -641,6 +641,14 @@ var InputHandler = /*#__PURE__*/function () {
     this.reverb = false; //prevent second click on touch release
     //
 
+    document.body.addEventListener('touchmove', function (event) {
+      //remove rubber banding
+      event.preventDefault();
+    }, {
+      passive: false,
+      useCapture: false
+    }); //
+
     document.getElementById("play").addEventListener("click", function (event) {
       document.getElementById("menu").style.visibility = "hidden";
       _this.game.level = 0;
@@ -1120,7 +1128,7 @@ var Game = /*#__PURE__*/function () {
       this.unit = this.artist.unit; //px length for each cell
       //
 
-      new _input.default(this); //handle key and mouse inputs
+      this.inputer = new _input.default(this); //handle key and mouse inputs
 
       this.menu = new _menu.default(this); //draw for WON and MENU gamestates
       //
@@ -1310,12 +1318,24 @@ var Game = /*#__PURE__*/function () {
         //
         if (key >= _levels.lvs.length) {
           //check level exists
-          console.log("Load command failed, level does not exist");
-          this.level--;
+          console.log("Load command failed, level does not exist"); //this.level--;
+
+          this.level = 0;
+          this.gameMode = 0; //set to generated mode
+
+          this.loadLevel(this.level);
+          this.grouper.identify();
+          this.grouper.selectGroup(this.inputer.lastMouseEvent);
         } else if (_levels.lvs[key].length < 4) {
           //check that a map exists
-          console.log("Load command failed, level is corrupted");
-          this.level--;
+          console.log("Load command failed, level is corrupted"); //this.level--;
+
+          this.level = 0;
+          this.gameMode = 0; //set to generated mode
+
+          this.loadLevel(this.level);
+          this.grouper.identify();
+          this.grouper.selectGroup(this.inputer.lastMouseEvent);
         } else {
           var level = _levels.lvs[key]; //reset variables
 
@@ -1509,6 +1529,9 @@ var whRatio = GAME_WIDTH / GAME_HEIGHT;
 var StartBt = document.getElementById("start");
 var title = document.getElementById("title");
 var menu = document.getElementById("menu");
+var won = document.getElementById("won");
+var nice = document.getElementById("nice");
+var quit = document.getElementById("quit");
 var cookieList = document.cookie.split("="); //decode cookie
 
 if (cookieList[1] < 1 || cookieList[2] == 0) {
@@ -1518,17 +1541,25 @@ if (cookieList[1] < 1 || cookieList[2] == 0) {
 if (whRatio > 1.3) {
   //horizontal
   title.style.top = "-15%";
-  title.style.fontSize = GAME_WIDTH * .12 + "px"; //StartBt.style.fontSize = (GAME_WIDTH * .07) + "px";
+  nice.style.top = "-10%";
+  title.style.fontSize = GAME_WIDTH * .12 + "px";
+  nice.style.fontSize = GAME_WIDTH * .10 + "px"; //StartBt.style.fontSize = (GAME_WIDTH * .07) + "px";
 } else {
   //vertical
   var divWidth = whRatio * -70 + 135;
   var divLeft = (100 - divWidth) / 2; //
 
   title.style.top = "-20%";
+  nice.style.top = "-10%";
   menu.style.left = divLeft + "%";
-  menu.style.width = divWidth + "%"; //
+  menu.style.width = divWidth + "%";
+  won.style.left = divLeft + "%";
+  won.style.width = divWidth + "%"; //
+  //quit.style.
+  //
 
-  title.style.fontSize = GAME_WIDTH * .004 * divWidth + "px"; //StartBt.style.fontSize = (GAME_WIDTH * .002 * divWidth) + "px";
+  title.style.fontSize = GAME_WIDTH * .004 * divWidth + "px";
+  nice.style.fontSize = GAME_WIDTH * .003 * divWidth + "px"; //StartBt.style.fontSize = (GAME_WIDTH * .002 * divWidth) + "px";
 }
 
 function gameLoop(timeStamp) {
