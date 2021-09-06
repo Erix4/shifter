@@ -37,8 +37,13 @@ export default class Game {
         //
         this.timer = 0;//timer to determine gamestate change from WON to MENU
         //
+        var cookieList = document.cookie.split("=");//decode cookie
+        this.savedLevel = cookieList[1];//get level value
+        this.gameMode = cookieList[2];
+        console.log(`Cookie: ${document.cookie}, saved level: ${this.savedLevel}, gamemode: ${this.gameMode}`);
+        //
         this.level = -1;//current level
-        this.gameMode = 0;//0 = generated, 1 = crafted
+        //this.gameMode = 0;//0 = generated, 1 = crafted
         //
         var i;
         this.map = new Array();//map of every cell in the grid
@@ -146,6 +151,9 @@ export default class Game {
             this.grouper.selectedGroup = this.inSize;
             document.getElementById("won").style.visibility = "visible";
             console.log("Gamestate changed to: 'WON'");
+            //
+            document.cookie = `level=${this.level + 1}=${this.gameMode}`;
+            console.log(`Cookie set, level: ${this.level + 1}`);
         }
     }
     //
@@ -194,9 +202,11 @@ export default class Game {
     }
     //
     loadLevel(key){//load level into grid based on level index (key)
+        //
         this.moving = this.inSize;
         //
         if(this.gameMode == 1){//crafted mode
+            //
             if(key >= lvs.length){//check level exists
                 console.log("Load command failed, level does not exist");
                 this.level--;
@@ -260,10 +270,14 @@ export default class Game {
             }
             //
             console.log("Complete, randomizing switches...");
-            this.stopOdds = this.level;//# of loops until chances are 50/50 for stopping
-            for(i = 0; (Math.random() > i / (i + this.stopOdds)) || this.checkCompletion(); i++){//switch cells for a random number of loops
+            this.stopOdds = this.level + 1;//# of loops until chances are 50/50 for stopping
+            console.log(0 / (0 + this.stopOdds));
+            for(i = 0; (Math.random() > i / (i + this.stopOdds)); i++){//switch cells for a random number of loops
                 var ranCell1 = this.cells[Math.floor(this.inCap * Math.random())];
                 var ranCell2 = this.cells[Math.floor(this.inCap * Math.random())];
+                while(ranCell1.state == ranCell2.state){
+                    ranCell2 = this.cells[Math.floor(this.inCap * Math.random())];
+                }
                 console.log(`Switching (${ranCell1.x}, ${ranCell1.y}) and (${ranCell2.x}, ${ranCell2.y})`);
                 //
                 this.map[ranCell1.locIndex] = ranCell2.valIndex;

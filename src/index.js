@@ -22,6 +22,11 @@ let StartBt = document.getElementById("start");
 let title = document.getElementById("title");
 let menu = document.getElementById("menu");
 
+var cookieList = document.cookie.split("=");//decode cookie
+if(cookieList[1] < 1 || cookieList [2] == 0){
+    document.getElementById("startOver").innerHTML = "Tutorial";
+}
+
 if(whRatio > 1.3){//horizontal
     title.style.top = "-15%";
     title.style.fontSize = (GAME_WIDTH * .12) + "px"; 

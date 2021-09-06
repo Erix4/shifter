@@ -9,7 +9,7 @@ export default class InputHandler{
         //
         document.getElementById("play").addEventListener("click", event => {
             document.getElementById("menu").style.visibility = "hidden";
-            this.game.level++;
+            this.game.level = 0;
             this.game.gameMode = 0;//set to generated mode
             this.game.loadLevel(this.game.level);
             this.game.grouper.identify();
@@ -18,10 +18,12 @@ export default class InputHandler{
         //
         document.getElementById("continue").addEventListener("click", event => {
             document.getElementById("menu").style.visibility = "hidden";
-            var cookieList = document.cookie.split("=");//decode cookie
-            this.game.level = cookieList[1];//get level value
-            console.log(`Cookie: ${document.cookie}, level: ${this.game.level}`);
-            this.game.gameMode = 1;//set to crafted mode
+            console.log(`level: ${this.game.level}`);
+            if(this.game.level == -1){
+                this.game.level = this.game.savedLevel;
+                console.log(`Recalling level ${this.game.level}`);
+            }
+            //this.game.gameMode = 1;//set to crafted mode
             this.game.loadLevel(this.game.level);
             this.game.grouper.identify();
             this.game.grouper.selectGroup(this.lastMouseEvent);
@@ -29,10 +31,9 @@ export default class InputHandler{
         //
         document.getElementById("startOver").addEventListener("click", event => {
             document.getElementById("menu").style.visibility = "hidden";
-            this.game.level++;
+            this.game.level = 0;
             this.game.gameMode = 1;//set to crafted mode
-            document.cookie = `level=0`;
-            this.game.loadLevel(this.game.level);
+            this.game.loadLevel(0);
             this.game.grouper.identify();
             this.game.grouper.selectGroup(this.lastMouseEvent);
         });
@@ -122,6 +123,7 @@ export default class InputHandler{
         //
         document.addEventListener("mouseup", event => {
             if(this.game.moving != this.game.inSize){
+                this.game.moveGroup(event);
                 this.game.stopGroupMove();
             }
         });

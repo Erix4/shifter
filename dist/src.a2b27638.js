@@ -643,7 +643,7 @@ var InputHandler = /*#__PURE__*/function () {
 
     document.getElementById("play").addEventListener("click", function (event) {
       document.getElementById("menu").style.visibility = "hidden";
-      _this.game.level++;
+      _this.game.level = 0;
       _this.game.gameMode = 0; //set to generated mode
 
       _this.game.loadLevel(_this.game.level);
@@ -655,12 +655,13 @@ var InputHandler = /*#__PURE__*/function () {
 
     document.getElementById("continue").addEventListener("click", function (event) {
       document.getElementById("menu").style.visibility = "hidden";
-      var cookieList = document.cookie.split("="); //decode cookie
+      console.log("level: ".concat(_this.game.level));
 
-      _this.game.level = cookieList[1]; //get level value
+      if (_this.game.level == -1) {
+        _this.game.level = _this.game.savedLevel;
+        console.log("Recalling level ".concat(_this.game.level));
+      } //this.game.gameMode = 1;//set to crafted mode
 
-      console.log("Cookie: ".concat(document.cookie, ", level: ").concat(_this.game.level));
-      _this.game.gameMode = 1; //set to crafted mode
 
       _this.game.loadLevel(_this.game.level);
 
@@ -671,12 +672,10 @@ var InputHandler = /*#__PURE__*/function () {
 
     document.getElementById("startOver").addEventListener("click", function (event) {
       document.getElementById("menu").style.visibility = "hidden";
-      _this.game.level++;
+      _this.game.level = 0;
       _this.game.gameMode = 1; //set to crafted mode
 
-      document.cookie = "level=0";
-
-      _this.game.loadLevel(_this.game.level);
+      _this.game.loadLevel(0);
 
       _this.game.grouper.identify();
 
@@ -790,6 +789,8 @@ var InputHandler = /*#__PURE__*/function () {
 
     document.addEventListener("mouseup", function (event) {
       if (_this.game.moving != _this.game.inSize) {
+        _this.game.moveGroup(event);
+
         _this.game.stopGroupMove();
       }
     }); //
@@ -972,12 +973,6 @@ var Menu = /*#__PURE__*/function () {
 
       if (event.offsetX > this.boundLeft && event.offsetX < this.boundRight && event.offsetY > this.boundTop && event.offsetY < this.boundBottom || this.game.gamestate > 1) {
         this.game.level++;
-
-        if (this.game.gameMode == 1) {
-          document.cookie = "level=".concat(this.game.level);
-          console.log("Cookie set, level: ".concat(this.game.level));
-        }
-
         console.log("Bounds successful, level: ".concat(this.game.level));
         this.game.loadLevel(this.game.level);
       }
@@ -1082,9 +1077,15 @@ var Game = /*#__PURE__*/function () {
       this.timer = 0; //timer to determine gamestate change from WON to MENU
       //
 
-      this.level = -1; //current level
+      var cookieList = document.cookie.split("="); //decode cookie
 
-      this.gameMode = 0; //0 = generated, 1 = crafted
+      this.savedLevel = cookieList[1]; //get level value
+
+      this.gameMode = cookieList[2];
+      console.log("Cookie: ".concat(document.cookie, ", saved level: ").concat(this.savedLevel, ", gamemode: ").concat(this.gameMode)); //
+
+      this.level = -1; //current level
+      //this.gameMode = 0;//0 = generated, 1 = crafted
       //
 
       var i;
@@ -1234,7 +1235,10 @@ var Game = /*#__PURE__*/function () {
         this.gamestate = GAMESTATE.WON;
         this.grouper.selectedGroup = this.inSize;
         document.getElementById("won").style.visibility = "visible";
-        console.log("Gamestate changed to: 'WON'");
+        console.log("Gamestate changed to: 'WON'"); //
+
+        document.cookie = "level=".concat(this.level + 1, "=").concat(this.gameMode);
+        console.log("Cookie set, level: ".concat(this.level + 1));
       }
     } //
 
@@ -1298,10 +1302,12 @@ var Game = /*#__PURE__*/function () {
       var _this = this;
 
       //load level into grid based on level index (key)
+      //
       this.moving = this.inSize; //
 
       if (this.gameMode == 1) {
         //crafted mode
+        //
         if (key >= _levels.lvs.length) {
           //check level exists
           console.log("Load command failed, level does not exist");
@@ -1392,12 +1398,19 @@ var Game = /*#__PURE__*/function () {
 
 
         console.log("Complete, randomizing switches...");
-        this.stopOdds = this.level; //# of loops until chances are 50/50 for stopping
+        this.stopOdds = this.level + 1; //# of loops until chances are 50/50 for stopping
 
-        for (i = 0; Math.random() > i / (i + this.stopOdds) || this.checkCompletion(); i++) {
+        console.log(0 / (0 + this.stopOdds));
+
+        for (i = 0; Math.random() > i / (i + this.stopOdds); i++) {
           //switch cells for a random number of loops
           var ranCell1 = this.cells[Math.floor(this.inCap * Math.random())];
           var ranCell2 = this.cells[Math.floor(this.inCap * Math.random())];
+
+          while (ranCell1.state == ranCell2.state) {
+            ranCell2 = this.cells[Math.floor(this.inCap * Math.random())];
+          }
+
           console.log("Switching (".concat(ranCell1.x, ", ").concat(ranCell1.y, ") and (").concat(ranCell2.x, ", ").concat(ranCell2.y, ")")); //
 
           this.map[ranCell1.locIndex] = ranCell2.valIndex;
@@ -1496,6 +1509,11 @@ var whRatio = GAME_WIDTH / GAME_HEIGHT;
 var StartBt = document.getElementById("start");
 var title = document.getElementById("title");
 var menu = document.getElementById("menu");
+var cookieList = document.cookie.split("="); //decode cookie
+
+if (cookieList[1] < 1 || cookieList[2] == 0) {
+  document.getElementById("startOver").innerHTML = "Tutorial";
+}
 
 if (whRatio > 1.3) {
   //horizontal
