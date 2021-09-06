@@ -65,10 +65,10 @@ export default class InputHandler{
         document.addEventListener("mousedown", event => {
             if(!this.reverb){
                 if(this.game.gamestate == 1 || this.game.gamestate == 2){
-                    this.game.menu.checkNext(event);
+                    /*this.game.menu.checkNext(event);
                     //console.log("Identifying");
                     this.game.grouper.identify();
-                    this.game.grouper.selectGroup(event);
+                    this.game.grouper.selectGroup(event);*/
                 }else if(this.game.grouper.selectedGroup != this.game.inSize){
                     this.game.startGroupMove(event);
                 }

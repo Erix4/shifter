@@ -715,12 +715,10 @@ var InputHandler = /*#__PURE__*/function () {
     document.addEventListener("mousedown", function (event) {
       if (!_this.reverb) {
         if (_this.game.gamestate == 1 || _this.game.gamestate == 2) {
-          _this.game.menu.checkNext(event); //console.log("Identifying");
-
-
-          _this.game.grouper.identify();
-
-          _this.game.grouper.selectGroup(event);
+          /*this.game.menu.checkNext(event);
+          //console.log("Identifying");
+          this.game.grouper.identify();
+          this.game.grouper.selectGroup(event);*/
         } else if (_this.game.grouper.selectedGroup != _this.game.inSize) {
           _this.game.startGroupMove(event);
         }
