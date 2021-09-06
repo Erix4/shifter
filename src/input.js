@@ -57,6 +57,8 @@ export default class InputHandler{
             document.getElementById("won").style.visibility = "hidden";
             document.getElementById("menu").style.visibility = "visible";
             this.game.confi = [];
+            this.game.gamestate = 3;//changed to START gamestate to remove confetti addage
+            console.log("Gamestate changed to: 'START'");
         });
         //
         document.addEventListener("mousemove", event => {

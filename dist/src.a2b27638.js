@@ -705,6 +705,9 @@ var InputHandler = /*#__PURE__*/function () {
       document.getElementById("won").style.visibility = "hidden";
       document.getElementById("menu").style.visibility = "visible";
       _this.game.confi = [];
+      _this.game.gamestate = 3; //changed to START gamestate to remove confetti addage
+
+      console.log("Gamestate changed to: 'START'");
     }); //
 
     document.addEventListener("mousemove", function (event) {
