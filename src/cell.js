@@ -1,6 +1,5 @@
 export default class Cell{
     constructor(game, valIndex){
-        //
         this.gameWidth = game.gameWidth;
         this.gameHeight = game.gameHeight;
         //

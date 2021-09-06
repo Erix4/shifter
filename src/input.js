@@ -50,11 +50,13 @@ export default class InputHandler{
             this.game.loadLevel(this.game.level);
             this.game.grouper.identify();
             this.game.grouper.selectGroup(this.lastMouseEvent);
+            this.game.confi = [];
         });
         //
         document.getElementById("quit").addEventListener("click", event => {
             document.getElementById("won").style.visibility = "hidden";
             document.getElementById("menu").style.visibility = "visible";
+            this.game.confi = [];
         });
         //
         document.addEventListener("mousemove", event => {

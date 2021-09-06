@@ -3,6 +3,7 @@ import Artist from "./artist";
 import Grouper from "./grouper";
 import InputHandler from "./input";
 import Menu from "./menu";
+import Confetto from "./confetti";
 import {levels, lvs} from "./levels";
 
 const GAMESTATE = {
@@ -75,6 +76,9 @@ export default class Game {
         this.viewMode = 0;//group selection mode, 0 = rows, 1 = columns (space to switch)
         //
         this.grouper.identify();//indentify tile groups
+        //
+        this.confAng = Math.tanh(this.gameWidth / this.gameHeight) * 180 / Math.PI;
+        this.confi = [];
     }
     //
     draw(ctx){//draw objects
@@ -93,6 +97,11 @@ export default class Game {
             //
             case GAMESTATE.MENU:
                 //this.menu.drawMenu(ctx);
+                if(Math.random() > 0.8){
+                    this.confi.push(new Confetto(this, 1));
+                }
+                this.confi.forEach(confetto => confetto.draw(ctx));
+                this.confi = this.confi.filter(confetto => !confetto.toBeDeleted);
                 break;
             //
             case GAMESTATE.START:
@@ -111,12 +120,7 @@ export default class Game {
             this.timer = 0;
         }else{
             this.menu.update(deltaTime);
-            if(this.gamestate == GAMESTATE.WON && this.timer > 2000){
-                this.gamestate = GAMESTATE.MENU;
-                console.log("Gamestate changed to: 'MENU'");
-            }else{
-                this.timer += deltaTime;
-            }
+            this.confi.forEach(confetto => confetto.update(deltaTime));
         }
         //
     }
@@ -147,10 +151,14 @@ export default class Game {
             this.cells[group[i]].resetOrigin();
         }
         if(this.checkCompletion() && this.gamestate != GAMESTATE.CREATE){
-            this.gamestate = GAMESTATE.WON;
+            this.gamestate = GAMESTATE.MENU;
             this.grouper.selectedGroup = this.inSize;
             document.getElementById("won").style.visibility = "visible";
-            console.log("Gamestate changed to: 'WON'");
+            console.log("Gamestate changed to: 'MENU'");
+            //
+            for(var n = 0; n < 50; n++){
+                this.confi.push(new Confetto(this, 0));
+            }
             //
             this.level++;
             document.cookie = `level=${this.level}=${this.gameMode}`;

@@ -135,7 +135,6 @@ var Cell = /*#__PURE__*/function () {
   function Cell(game, valIndex) {
     _classCallCheck(this, Cell);
 
-    //
     this.gameWidth = game.gameWidth;
     this.gameHeight = game.gameHeight; //
 
@@ -698,11 +697,14 @@ var InputHandler = /*#__PURE__*/function () {
       _this.game.grouper.identify();
 
       _this.game.grouper.selectGroup(_this.lastMouseEvent);
+
+      _this.game.confi = [];
     }); //
 
     document.getElementById("quit").addEventListener("click", function (event) {
       document.getElementById("won").style.visibility = "hidden";
       document.getElementById("menu").style.visibility = "visible";
+      _this.game.confi = [];
     }); //
 
     document.addEventListener("mousemove", function (event) {
@@ -995,6 +997,154 @@ var Menu = /*#__PURE__*/function () {
 }();
 
 exports.default = Menu;
+},{}],"src/confetti.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Confetto = /*#__PURE__*/function () {
+  function Confetto(game, mode) {
+    _classCallCheck(this, Confetto);
+
+    this.gameWidth = game.gameWidth;
+    this.gameHeight = game.gameHeight; //
+
+    this.game = game; //
+
+    this.size = {
+      width: 30,
+      height: 10
+    }; //dimensions of the confetto
+
+    this.hs = {
+      w: this.size.width / 2,
+      h: this.size.height / 2
+    }; //half the dimension (for offsetting to the center)
+    //
+
+    this.spin = getRandom(-180, 180); //
+
+    if (mode == 0) {
+      this.position = {
+        x: this.gameWidth / 2,
+        y: this.gameHeight / 2
+      };
+      this.direction = getRandom(-this.game.confAng, this.game.confAng); //
+
+      this.speed = {
+        d: getRandom(700, 900),
+        angle: getRandom(-100, 100)
+      }; //pixels per second
+
+      this.accel = 0; //-250;//pixels per second per second (angle doesn't accelerate)
+    } else {
+      this.position = {
+        x: getRandom(0, this.gameWidth),
+        y: -this.size.width
+      };
+      this.direction = 180; //
+
+      this.speed = {
+        d: getRandom(20, 80),
+        angle: getRandom(-100, 100)
+      };
+      this.accel = 0;
+    } //
+
+
+    this.toBeDeleted = false; //
+
+    this.cN = Math.floor(getRandom(0, 4.5));
+
+    switch (this.cN) {
+      case 0:
+        this.color = "red";
+        break;
+
+      case 1:
+        this.color = "blue";
+        break;
+
+      case 2:
+        this.color = "green";
+        break;
+
+      case 3:
+        this.color = "orange";
+        break;
+
+      case 4:
+        this.color = "purple";
+        break;
+    } //
+    //console.log(`Confetto init at ${this.position.x}, ${this.position.y}`);
+
+  } //
+
+
+  _createClass(Confetto, [{
+    key: "draw",
+    value: function draw(ctx) {
+      //
+      ctx.translate(this.position.x, this.position.y);
+      ctx.rotate(toRadians(this.spin));
+      ctx.translate(-this.position.x, -this.position.y);
+      ctx.beginPath();
+      ctx.rect(this.position.x - this.hs.w, this.position.y - this.hs.h, this.size.width, this.size.height);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+      ctx.translate(this.position.x, this.position.y);
+      ctx.rotate(-toRadians(this.spin));
+      ctx.translate(-this.position.x, -this.position.y); //
+    } //
+
+  }, {
+    key: "update",
+    value: function update(deltaTime) {
+      if (this.position.y > this.gameHeight + this.hs.w || this.mode == 0 && this.position.y < -this.hs.w) {
+        this.toBeDeleted = true;
+      } //
+
+
+      this.speed.d += this.accel * deltaTime / 1000;
+      this.spin += this.speed.angle * deltaTime / 1000; //
+
+      this.position.x += this.speed.d * Math.sin(toRadians(this.direction)) * deltaTime / 1000;
+      this.position.y -= this.speed.d * Math.cos(toRadians(this.direction)) * deltaTime / 1000;
+    }
+  }]);
+
+  return Confetto;
+}();
+
+exports.default = Confetto;
+
+function getRandom(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function toRadians(deg) {
+  return deg * Math.PI / 180;
+}
+
+function fixAngle(angle) {
+  if (angle > 180) {
+    angle -= 360;
+  } else if (angle < -180) {
+    angle += 360;
+  }
+
+  return angle;
+}
 },{}],"src/levels.js":[function(require,module,exports) {
 "use strict";
 
@@ -1030,6 +1180,8 @@ var _grouper = _interopRequireDefault(require("./grouper"));
 var _input = _interopRequireDefault(require("./input"));
 
 var _menu = _interopRequireDefault(require("./menu"));
+
+var _confetti = _interopRequireDefault(require("./confetti"));
 
 var _levels = require("./levels");
 
@@ -1143,6 +1295,10 @@ var Game = /*#__PURE__*/function () {
       //
 
       this.grouper.identify(); //indentify tile groups
+      //
+
+      this.confAng = Math.tanh(this.gameWidth / this.gameHeight) * 180 / Math.PI;
+      this.confi = [];
     } //
 
   }, {
@@ -1168,6 +1324,16 @@ var Game = /*#__PURE__*/function () {
 
         case GAMESTATE.MENU:
           //this.menu.drawMenu(ctx);
+          if (Math.random() > 0.8) {
+            this.confi.push(new _confetti.default(this, 1));
+          }
+
+          this.confi.forEach(function (confetto) {
+            return confetto.draw(ctx);
+          });
+          this.confi = this.confi.filter(function (confetto) {
+            return !confetto.toBeDeleted;
+          });
           break;
         //
 
@@ -1195,13 +1361,9 @@ var Game = /*#__PURE__*/function () {
         this.timer = 0;
       } else {
         this.menu.update(deltaTime);
-
-        if (this.gamestate == GAMESTATE.WON && this.timer > 2000) {
-          this.gamestate = GAMESTATE.MENU;
-          console.log("Gamestate changed to: 'MENU'");
-        } else {
-          this.timer += deltaTime;
-        }
+        this.confi.forEach(function (confetto) {
+          return confetto.update(deltaTime);
+        });
       } //
 
     } //
@@ -1242,10 +1404,15 @@ var Game = /*#__PURE__*/function () {
       }
 
       if (this.checkCompletion() && this.gamestate != GAMESTATE.CREATE) {
-        this.gamestate = GAMESTATE.WON;
+        this.gamestate = GAMESTATE.MENU;
         this.grouper.selectedGroup = this.inSize;
         document.getElementById("won").style.visibility = "visible";
-        console.log("Gamestate changed to: 'WON'"); //
+        console.log("Gamestate changed to: 'MENU'"); //
+
+        for (var n = 0; n < 50; n++) {
+          this.confi.push(new _confetti.default(this, 0));
+        } //
+
 
         this.level++;
         document.cookie = "level=".concat(this.level, "=").concat(this.gameMode);
@@ -1511,7 +1678,7 @@ var Game = /*#__PURE__*/function () {
 }();
 
 exports.default = Game;
-},{"./cell":"src/cell.js","./artist":"src/artist.js","./grouper":"src/grouper.js","./input":"src/input.js","./menu":"src/menu.js","./levels":"src/levels.js"}],"src/index.js":[function(require,module,exports) {
+},{"./cell":"src/cell.js","./artist":"src/artist.js","./grouper":"src/grouper.js","./input":"src/input.js","./menu":"src/menu.js","./confetti":"src/confetti.js","./levels":"src/levels.js"}],"src/index.js":[function(require,module,exports) {
 "use strict";
 
 var _game = _interopRequireDefault(require("/src/game"));
