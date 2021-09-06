@@ -87,12 +87,12 @@ export default class Game {
                 break;
             //
             case GAMESTATE.WON:
-                this.gameObjects.forEach(object => object.draw(ctx));
-                this.menu.drawWon(ctx);
+                //this.gameObjects.forEach(object => object.draw(ctx));
+                //this.menu.drawWon(ctx);
                 break;
             //
             case GAMESTATE.MENU:
-                this.menu.drawMenu(ctx);
+                //this.menu.drawMenu(ctx);
                 break;
             //
             case GAMESTATE.START:
@@ -152,8 +152,9 @@ export default class Game {
             document.getElementById("won").style.visibility = "visible";
             console.log("Gamestate changed to: 'WON'");
             //
-            document.cookie = `level=${this.level + 1}=${this.gameMode}`;
-            console.log(`Cookie set, level: ${this.level + 1}`);
+            this.level++;
+            document.cookie = `level=${this.level}=${this.gameMode}`;
+            console.log(`Cookie set, level: ${this.level}`);
         }
     }
     //

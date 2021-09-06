@@ -47,10 +47,14 @@ export default class InputHandler{
         //
         document.getElementById("next").addEventListener("click", event => {
             document.getElementById("won").style.visibility = "hidden";
-            this.game.level++;
             this.game.loadLevel(this.game.level);
             this.game.grouper.identify();
             this.game.grouper.selectGroup(this.lastMouseEvent);
+        });
+        //
+        document.getElementById("quit").addEventListener("click", event => {
+            document.getElementById("won").style.visibility = "hidden";
+            document.getElementById("menu").style.visibility = "visible";
         });
         //
         document.addEventListener("mousemove", event => {

@@ -692,13 +692,17 @@ var InputHandler = /*#__PURE__*/function () {
 
     document.getElementById("next").addEventListener("click", function (event) {
       document.getElementById("won").style.visibility = "hidden";
-      _this.game.level++;
 
       _this.game.loadLevel(_this.game.level);
 
       _this.game.grouper.identify();
 
       _this.game.grouper.selectGroup(_this.lastMouseEvent);
+    }); //
+
+    document.getElementById("quit").addEventListener("click", function (event) {
+      document.getElementById("won").style.visibility = "hidden";
+      document.getElementById("menu").style.visibility = "visible";
     }); //
 
     document.addEventListener("mousemove", function (event) {
@@ -1157,15 +1161,13 @@ var Game = /*#__PURE__*/function () {
         //
 
         case GAMESTATE.WON:
-          this.gameObjects.forEach(function (object) {
-            return object.draw(ctx);
-          });
-          this.menu.drawWon(ctx);
+          //this.gameObjects.forEach(object => object.draw(ctx));
+          //this.menu.drawWon(ctx);
           break;
         //
 
         case GAMESTATE.MENU:
-          this.menu.drawMenu(ctx);
+          //this.menu.drawMenu(ctx);
           break;
         //
 
@@ -1245,8 +1247,9 @@ var Game = /*#__PURE__*/function () {
         document.getElementById("won").style.visibility = "visible";
         console.log("Gamestate changed to: 'WON'"); //
 
-        document.cookie = "level=".concat(this.level + 1, "=").concat(this.gameMode);
-        console.log("Cookie set, level: ".concat(this.level + 1));
+        this.level++;
+        document.cookie = "level=".concat(this.level, "=").concat(this.gameMode);
+        console.log("Cookie set, level: ".concat(this.level));
       }
     } //
 
