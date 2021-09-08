@@ -85,9 +85,9 @@ export default class Game {
         switch(this.gamestate){
             case GAMESTATE.RUNNING:
                 this.gameObjects.forEach(object => object.draw(ctx));
-                ctx.font = '20px "Pixeled"';
-                ctx.fillStyle = "black";
-                ctx.fillText(("level: " + (parseInt(this.level) + 1)), 10, 20);
+                //ctx.font = '20px "Pixeled"';
+                //ctx.fillStyle = "black";
+                //ctx.fillText(("level: " + (parseInt(this.level) + 1)), 10, 20);
                 break;
             //
             case GAMESTATE.WON:
@@ -310,6 +310,7 @@ export default class Game {
             console.log("Complete!");
             this.grouper.identify();
         }
+        document.getElementById("levelNum").innerHTML = ("L" + (this.level + 1));
     }
     //
     checkCompletion(){//check if puzzle is solved

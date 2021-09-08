@@ -1311,10 +1311,10 @@ var Game = /*#__PURE__*/function () {
         case GAMESTATE.RUNNING:
           this.gameObjects.forEach(function (object) {
             return object.draw(ctx);
-          });
-          ctx.font = '20px "Pixeled"';
-          ctx.fillStyle = "black";
-          ctx.fillText("level: " + (parseInt(this.level) + 1), 10, 20);
+          }); //ctx.font = '20px "Pixeled"';
+          //ctx.fillStyle = "black";
+          //ctx.fillText(("level: " + (parseInt(this.level) + 1)), 10, 20);
+
           break;
         //
 
@@ -1616,6 +1616,8 @@ var Game = /*#__PURE__*/function () {
         console.log("Complete!");
         this.grouper.identify();
       }
+
+      document.getElementById("levelNum").innerHTML = "L" + (this.level + 1);
     } //
 
   }, {
@@ -1774,7 +1776,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64187" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56199" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
